@@ -1,0 +1,10 @@
+1. for migration - php artisan migrate,
+2. For run server - php artisan serve
+3. npm run dev
+
+4. #> Tailwind CSS Install -> npm install tailwindcss @tailwindcss/vite
+
+5. Create new php file -> php artisan make:component Header
+6. Create link for browser show -> php artisan storage:link
+     -> <img src="{{ asset('storage/nid_images/' . $user->nid_image) }}" alt="NID Image">
+7. Create Middleware -> php artisan make:middleware AdminMiddleware

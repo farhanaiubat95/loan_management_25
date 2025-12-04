@@ -1,0 +1,17 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Admin Dashboard') }}
+        </h2>
+    </x-slot>
+
+    <div>
+        <div class="w-full">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-red-900">
+                    {{ __('Admin Dashboard') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
