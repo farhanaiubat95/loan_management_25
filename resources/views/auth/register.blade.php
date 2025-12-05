@@ -79,19 +79,6 @@
             </div>
 
             <div class="flex-1 min-w-[250px]">
-                <x-input-label class="text-blue-900 text-[16px]" for="nid_image">
-                    NID Card Image <span class="text-red-600">*</span>
-                </x-input-label>
-
-                <input id="nid_image" name="nid_image" type="file" required
-                    class="block mt-1 w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 
-               rounded-md shadow-sm 
-               file:bg-blue-900 file:text-white file:px-4 file:py-2 file:border-0 file:rounded-md file:mr-4">
-
-                <x-input-error :messages="$errors->get('nid_image')" class="mt-2" />
-            </div>
-
-            <div class="flex-1 min-w-[250px]">
                 <x-input-label class="text-blue-900 text-[16px]" for="address" :value="__('Full Address')" />
                 <x-text-input id="address" class="block mt-1 w-full" placeholder="Your full address" type="text"
                     name="address" :value="old('address')" required />

@@ -35,7 +35,7 @@ class RegisteredUserController extends Controller
             'phone'       => ['required', 'string', 'max:20'],
             'dob'         => ['required', 'date'],
             'nid'         => ['required', 'string', 'max:50'],
-            'nid_image'   => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'nid_image'   => ['image', 'mimes:jpg,jpeg,png', 'max:2048'],
             'address'     => ['required', 'string', 'max:500'],
             'occupation'  => ['required', 'string', 'max:255'],
             'income'      => ['required', 'numeric'],
