@@ -1,4 +1,4 @@
-<x-guest-layout class="pt-10">
+<x-guest-layout>
 
     <!-- TITLE -->
     <div class="text-center mb-10 mt-10 md:mt-0">
