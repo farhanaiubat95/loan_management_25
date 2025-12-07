@@ -36,7 +36,7 @@
 
         <!-- CARD (WIDER NOW) -->
         <div
-            class="relative px-3 lg:max-w-7xl mt-6 lg:px-10 py-10 bg-white/80 backdrop-blur-xl 
+            class="relative px-3 lg:max-w-7xl mt-16 lg:px-10 py-10 bg-white/80 backdrop-blur-xl 
                 shadow-2xl rounded-2xl border border-gray-100">
             {{ $slot }}
         </div>

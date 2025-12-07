@@ -20,16 +20,9 @@
                 <x-input-label class="text-blue-900 font-semibold" for="email" :value="__('Email Address')" />
 
                 <div class="mt-1 relative">
-                    <input 
-                        id="email" 
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        required
-                        autofocus
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
                         autocomplete="username"
-                        class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-700 focus:border-blue-700 px-4 py-2"
-                    >
+                        class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-700 focus:border-blue-700 px-4 py-2">
                 </div>
 
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
@@ -39,14 +32,8 @@
             <div>
                 <x-input-label class="text-blue-900 font-semibold" for="password" :value="__('Password')" />
 
-                <input 
-                    id="password" 
-                    type="password"
-                    name="password"
-                    required
-                    autocomplete="current-password"
-                    class="block mt-1 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-700 focus:border-blue-700 px-4 py-2"
-                >
+                <input id="password" type="password" name="password" required autocomplete="current-password"
+                    class="block mt-1 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-700 focus:border-blue-700 px-4 py-2">
 
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
@@ -54,12 +41,8 @@
             <!-- Remember Me -->
             <div class="flex items-center justify-between">
                 <label for="remember_me" class="flex items-center cursor-pointer">
-                    <input 
-                        id="remember_me"
-                        type="checkbox"
-                        name="remember"
-                        class="rounded border-gray-300 text-blue-900 shadow-sm focus:ring-blue-700"
-                    >
+                    <input id="remember_me" type="checkbox" name="remember"
+                        class="rounded border-gray-300 text-blue-900 shadow-sm focus:ring-blue-700">
                     <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
                 </label>
 
@@ -73,8 +56,7 @@
 
             <!-- Action Buttons -->
             <div class="pt-2">
-                <button
-                    type="submit"
+                <button type="submit"
                     class="w-full py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold tracking-wide transition">
                     {{ __('Log In') }}
                 </button>
