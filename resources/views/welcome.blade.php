@@ -15,15 +15,32 @@
     <x-header />
 
     <!-- HERO -->
-    <section class="w-full py-16 bg-gradient-to-b from-white to-blue-50">
-        <div class="max-w-4xl mx-auto text-center px-6">
-            <h1 class="text-5xl font-bold text-gray-900">Loan management system</h1>
-            <p class="mt-4 text-gray-600 leading-relaxed">
-                Experience a seamless next-gen loan management system focused on working capital, built to meet needs of
-                banks & NBFCs with flexible scalability.
+    <section class="relative w-full h-[90vh] md:h-[95vh] flex items-center justify-center overflow-hidden bg-purple-700">
+
+        <!-- Background Image -->
+        <img src="{{ asset('storage/all_support_images/loan-logo.jfif') }}" class="absolute inset-0 w-full h-full object-cover" />
+
+        <!-- Dark Overlay -->
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+
+        <!-- HERO CONTENT -->
+        <div class="relative z-10 max-w-4xl mx-auto text-center px-6 text-white">
+            <h1 class="text-4xl md:text-6xl font-bold leading-tight">
+                Loan Management System
+            </h1>
+
+            <p class="mt-4 text-lg md:text-xl opacity-90">
+                A modern, secure and automated system to manage loans, borrowers and financial workflows efficiently.
             </p>
+
+            <button
+                class="mt-8 px-8 py-3 bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold rounded-full shadow-lg">
+                Get Started
+            </button>
         </div>
+
     </section>
+
 
     <!-- KEY FEATURES -->
     <section class="py-20">
@@ -145,7 +162,7 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-gray-100 py-10">
+    <footer class="bg-gray-100 py-9">
         <div class="max-w-7xl mx-auto px-6 text-gray-600 grid md:grid-cols-4 gap-6">
 
             <!-- Column 1 -->
