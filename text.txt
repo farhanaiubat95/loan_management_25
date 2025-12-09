@@ -8,3 +8,6 @@
 6. Create link for browser show -> php artisan storage:link
      -> <img src="{{ asset('storage/nid_images/' . $user->nid_image) }}" alt="NID Image">
 7. Create Middleware -> php artisan make:middleware AdminMiddleware
+
+8. <img src="{{ asset('storage/all_support_images/loan-logo.jfif') }}"
+            class="absolute inset-0 w-full h-full object-cover" />
