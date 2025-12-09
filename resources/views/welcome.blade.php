@@ -18,7 +18,8 @@
     <section class="relative w-full h-[90vh] md:h-[95vh] flex items-center justify-center overflow-hidden bg-purple-700">
 
         <!-- Background Image -->
-        <img src="{{ asset('storage/all_support_images/loan-logo.jfif') }}" class="absolute inset-0 w-full h-full object-cover" />
+        <img src="{{ asset('storage/all_support_images/loan-logo.jfif') }}"
+            class="absolute inset-0 w-full h-full object-cover" />
 
         <!-- Dark Overlay -->
         <div class="absolute inset-0 bg-black bg-opacity-50"></div>
@@ -49,68 +50,70 @@
             An end-to-end, customisable Loan Management Solution
         </p>
 
-        <div class="max-w-6xl mx-auto px-6 mt-12 grid md:grid-cols-2 gap-10">
+        <div class="max-w-6xl mx-auto px-6 mt-12 
+                flex flex-col md:flex-row gap-10">
 
-            <!-- Left Column: Feature List -->
-            <div class="space-y-10">
+            <!-- LEFT -->
+            <div class="flex-1 space-y-10">
 
-                <div class="flex gap-4">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12" />
+                <div class="flex gap-4 animate-feature hover:scale-[1.03] transition">
+                    <img src="{{ asset('storage/all_support_images/loan-logo.jfif') }}" class="w-12 h-12" />
                     <div>
                         <h3 class="font-bold text-lg">360° integrated lending solution</h3>
                         <p class="text-gray-600">Tailored toolset meeting needs of financial institutions.</p>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12" />
+                <div class="flex gap-4 animate-feature hover:scale-[1.03] transition delay-100">
+                    <img src="{{ asset('storage/all_support_images/features-1.jfif') }}" class="w-12 h-12" />
                     <div>
                         <h3 class="font-bold text-lg">Easy monitoring</h3>
                         <p class="text-gray-600">Monitor borrowers through a parameterised approach.</p>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12" />
+                <div class="flex gap-4 animate-feature hover:scale-[1.03] transition delay-200">
+                    <img src="{{ asset('storage/all_support_images/features-2.jfif') }}" class="w-12 h-12" />
                     <div>
                         <h3 class="font-bold text-lg">Customisable settlement capabilities</h3>
                         <p class="text-gray-600">Configure payments and tranche settlements.</p>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12" />
+            </div>
+
+            <!-- RIGHT -->
+            <div class="flex-1 space-y-10">
+
+                <div class="flex gap-4 animate-feature hover:scale-[1.03] transition delay-300">
+                    <img src="{{ asset('storage/all_support_images/features-3.jfif') }}" class="w-12 h-12" />
                     <div>
                         <h3 class="font-bold text-lg">Better credit risk management</h3>
                         <p class="text-gray-600">Strengthen credit risk with powerful credit analytics.</p>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12" />
+                <div class="flex gap-4 animate-feature hover:scale-[1.03] transition delay-500">
+                    <img src="{{ asset('storage/all_support_images/features-4.jfif') }}" class="w-12 h-12" />
                     <div>
                         <h3 class="font-bold text-lg">Streamlined back-office operations</h3>
                         <p class="text-gray-600">Boost transparency and processing efficiency.</p>
                     </div>
                 </div>
 
-                <div class="flex gap-4">
-                    <img src="https://via.placeholder.com/50" class="w-12 h-12" />
+                <div class="flex gap-4 animate-feature hover:scale-[1.03] transition delay-700">
+                    <img src="{{ asset('storage/all_support_images/features-5.jfif') }}" class="w-12 h-12" />
                     <div>
                         <h3 class="font-bold text-lg">Fully automated workflows</h3>
                         <p class="text-gray-600">Integrate automation to reduce manual dependency.</p>
                     </div>
                 </div>
-
-            </div>
-
-            <!-- Right Column: Illustration -->
-            <div class="flex justify-center items-start">
-                <img src="https://via.placeholder.com/400x500" class="rounded-xl shadow-xl" />
             </div>
 
         </div>
     </section>
+
+
 
     <!-- OTHER TECHNOLOGY PLATFORMS -->
     <section class="bg-blue-50 py-20">
@@ -208,7 +211,7 @@
         </div>
 
         <p class="text-center text-xs text-gray-500 mt-10">
-            © 2025 CredAble — All rights reserved
+            © 2025 Lonery — All rights reserved
         </p>
     </footer>
 
