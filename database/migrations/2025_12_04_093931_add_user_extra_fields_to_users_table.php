@@ -9,18 +9,37 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+public function up()
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->string('phone')->nullable();
-        $table->date('dob')->nullable();
-        $table->string('nid')->nullable();
-        $table->string('nid_image')->nullable();
-        $table->string('address')->nullable();
-        $table->string('occupation')->nullable();
-        $table->decimal('income', 10, 2)->nullable();
+
+        if (!Schema::hasColumn('users', 'phone')) {
+            $table->string('phone')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'dob')) {
+            $table->date('dob')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'nid')) {
+            $table->string('nid')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'nid_image')) {
+            $table->string('nid_image')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'address')) {
+            $table->text('address')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'occupation')) {
+            $table->string('occupation')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'income')) {
+            $table->double('income')->nullable();
+        }
+        if (!Schema::hasColumn('users', 'role')) {
+            $table->string('role')->default('user');
+        }
     });
 }
+
 
 public function down()
 {

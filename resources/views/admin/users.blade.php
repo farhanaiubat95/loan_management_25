@@ -4,7 +4,7 @@
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Users List</h1>
 
     {{-- USERS TABLE --}}
-    <div class="bg-white p-6 rounded-xl shadow border">
+    <div class="bg-white p-6 rounded-xl shadow border overflow-y-auto max-h-[70vh]">
 
         <table class="w-full border-collapse text-left">
             <thead>
@@ -39,20 +39,20 @@
                             </span>
                         </td>
 
-                        <td class="p-3 space-x-2">
+                        <td class="px-3 space-x-2 flex flex-row py-5">
                             <button onclick='openViewModal(@json($user))'
-                                class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                                View
+                                class="px-1 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                                <i class="fa fa-eye" aria-hidden="true"></i>
                             </button>
 
                             <button onclick='openEditModal(@json($user))'
-                                class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                Edit
+                                class="px-1 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                                <i class="fas fa-edit"></i>
                             </button>
 
                             <button onclick='confirmDelete({{ $user->id }}, @json($user->name))'
-                                class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                                Delete
+                                class="px-1 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                                <i class="fa-solid fa-trash"></i>
                             </button>
                         </td>
                     </tr>

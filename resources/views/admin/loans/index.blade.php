@@ -4,7 +4,7 @@
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Loan Management</h1>
 
     <!-- SUCCESS MESSAGE -->
-    @if (session('success'))
+    @if(session('success'))
         <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
             {{ session('success') }}
         </div>
@@ -12,7 +12,8 @@
 
     <!-- TOP BAR -->
     <div class="flex justify-end mb-4">
-        <button onclick="openCreateModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+        <button onclick="openCreateModal()"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
             + Create Loan
         </button>
     </div>
@@ -21,7 +22,7 @@
     <div class="bg-white p-6 rounded-xl shadow border overflow-x-auto">
         <table class="w-full text-left text-sm border-collapse">
             <thead>
-                <tr class="bg-gray-100 text-gray-700 border-b text-center">
+                <tr class="bg-gray-100 text-gray-700 border-b">
                     <th class="p-3">ID</th>
                     <th class="p-3">Borrower</th>
                     <th class="p-3">Amount</th>
@@ -29,13 +30,13 @@
                     <th class="p-3">Interest</th>
                     <th class="p-3">EMI</th>
                     <th class="p-3">Status</th>
-                    <th class="p-3">Action</th>
+                    <th class="p-3 text-right">Action</th>
                 </tr>
             </thead>
 
             <tbody>
                 @foreach ($loans as $loan)
-                    <tr class="border-b hover:bg-gray-50 text-center">
+                    <tr class="border-b hover:bg-gray-50">
                         <td class="p-3">{{ $loan->id }}</td>
                         <td class="p-3">{{ $loan->user->name }}</td>
                         <td class="p-3">{{ number_format($loan->amount, 2) }}</td>
@@ -43,37 +44,30 @@
                         <td class="p-3">{{ $loan->interest_rate }}%</td>
                         <td class="p-3">{{ number_format($loan->emi, 2) }}</td>
                         <td class="p-3">
-                            <span
-                                class="px-2 py-1 rounded text-xs 
-                                @if ($loan->status == 'approved') bg-green-100 text-green-600
-                                @elseif($loan->status == 'rejected') bg-red-100 text-red-600
-                                @elseif($loan->status == 'paid') bg-blue-100 text-blue-700
+                            <span class="px-2 py-1 rounded text-xs 
+                                @if($loan->status=='approved') bg-green-100 text-green-600
+                                @elseif($loan->status=='rejected') bg-red-100 text-red-600
+                                @elseif($loan->status=='paid') bg-blue-100 text-blue-700
                                 @else bg-yellow-100 text-yellow-700 @endif">
                                 {{ ucfirst($loan->status) }}
                             </span>
                         </td>
 
-                        <td class="px-3 py-5 text-right space-x-2 flex flex-row">
+                        <td class="p-3 text-right space-x-2">
                             <button onclick='openViewModal(@json($loan))'
-                                class="px-1 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                                <i class="fa fa-eye" aria-hidden="true"></i>
-                            </button>
-
-                            <button onclick='openEditModal(@json($loan))'
-                                class="px-1 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600">
-                                <i class="fas fa-edit"></i>
+                                class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
+                                View
                             </button>
 
                             <button onclick='openStatusModal({{ $loan->id }})'
-                                class="px-1 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                <i class="fa-solid fa-layer-group"></i>
+                                class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
+                                Status
                             </button>
 
                             <button onclick='openDeleteModal({{ $loan->id }})'
-                                class="px-1 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                                <i class="fa-solid fa-trash"></i>
+                                class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                                Delete
                             </button>
-
                         </td>
                     </tr>
                 @endforeach
@@ -100,9 +94,8 @@
                     <div>
                         <label>User</label>
                         <select name="user_id" class="w-full p-2 border rounded mt-1">
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
-                                </option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
                             @endforeach
                         </select>
                     </div>
@@ -150,24 +143,12 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                <div><strong>User:</strong>
-                    <p id="v_user"></p>
-                </div>
-                <div><strong>Amount:</strong>
-                    <p id="v_amount"></p>
-                </div>
-                <div><strong>Duration:</strong>
-                    <p id="v_duration"></p>
-                </div>
-                <div><strong>Interest Rate:</strong>
-                    <p id="v_interest"></p>
-                </div>
-                <div><strong>EMI:</strong>
-                    <p id="v_emi"></p>
-                </div>
-                <div><strong>Status:</strong>
-                    <p id="v_status"></p>
-                </div>
+                <div><strong>User:</strong> <p id="v_user"></p></div>
+                <div><strong>Amount:</strong> <p id="v_amount"></p></div>
+                <div><strong>Duration:</strong> <p id="v_duration"></p></div>
+                <div><strong>Interest Rate:</strong> <p id="v_interest"></p></div>
+                <div><strong>EMI:</strong> <p id="v_emi"></p></div>
+                <div><strong>Status:</strong> <p id="v_status"></p></div>
 
                 <div class="md:col-span-2">
                     <strong>Description:</strong>
@@ -186,7 +167,8 @@
     <!-- ------------------------------ -->
     <!-- STATUS MODAL -->
     <!-- ------------------------------ -->
-    <div id="statusModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
+    <div id="statusModal"
+        class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
 
         <div class="bg-white w-full max-w-md rounded-xl shadow-xl p-8 relative">
             <h2 class="text-xl font-bold mb-4">Update Loan Status</h2>
@@ -207,59 +189,6 @@
         </div>
     </div>
 
-    <!-- EDIT LOAN MODAL -->
-    <div id="editModal"
-        class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
-
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8 relative max-h-[90vh] overflow-y-auto">
-
-            <h2 class="text-2xl font-bold mb-6">Edit Loan</h2>
-
-            <form id="editForm" method="POST">
-                @csrf
-                @method('PUT')
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    <div>
-                        <label>Loan Amount</label>
-                        <input type="number" name="amount" id="e_amount" class="w-full p-2 border rounded mt-1"
-                            required>
-                    </div>
-
-                    <div>
-                        <label>Duration (Months)</label>
-                        <input type="number" name="duration" id="e_duration" class="w-full p-2 border rounded mt-1"
-                            required>
-                    </div>
-
-                    <div>
-                        <label>Interest Rate (%)</label>
-                        <input type="number" name="interest_rate" id="e_interest"
-                            class="w-full p-2 border rounded mt-1" required>
-                    </div>
-
-                    <div>
-                        <label>EMI (Auto Calculated)</label>
-                        <input type="text" id="e_emi" class="w-full p-2 border rounded mt-1 bg-gray-100"
-                            readonly>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label>Description</label>
-                        <textarea name="description" id="e_description" class="w-full p-2 border rounded mt-1"></textarea>
-                    </div>
-
-                </div>
-
-                <button class="mt-6 px-6 py-2 bg-blue-600 text-white rounded">Update Loan</button>
-            </form>
-
-            <button onclick="closeEditModal()"
-                class="absolute top-4 right-4 text-xl text-gray-600 hover:text-black">&times;</button>
-        </div>
-    </div>
-
 
     <!-- ------------------------------ -->
     <!-- DELETE LOAN ALERT -->
@@ -273,59 +202,6 @@
     </script>
 
 
-    <!-- Edit Model -->
-    <script>
-        function calculateEMI(amount, interest, duration) {
-            amount = parseFloat(amount);
-            interest = parseFloat(interest);
-            duration = parseInt(duration);
-
-            if (!amount || !interest || !duration) return "";
-
-            let monthlyRate = interest / 12 / 100;
-
-            let emi = amount * monthlyRate * Math.pow(1 + monthlyRate, duration) /
-                (Math.pow(1 + monthlyRate, duration) - 1);
-
-            return emi.toFixed(2);
-        }
-
-        function updateEMIField() {
-            let amt = document.getElementById('e_amount').value;
-            let rate = document.getElementById('e_interest').value;
-            let dur = document.getElementById('e_duration').value;
-
-            document.getElementById('e_emi').value = calculateEMI(amt, rate, dur);
-        }
-
-        function openEditModal(loan) {
-
-            document.getElementById('e_amount').value = loan.amount;
-            document.getElementById('e_duration').value = loan.duration;
-            document.getElementById('e_interest').value = loan.interest_rate;
-            document.getElementById('e_description').value = loan.description ?? '';
-
-            // Set EMI initially
-            document.getElementById('e_emi').value = loan.emi;
-
-            // Set form action
-            document.getElementById('editForm').action = `/admin/loans/${loan.id}`;
-
-            // Auto update EMI on change
-            ['e_amount', 'e_duration', 'e_interest'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateEMIField);
-            });
-
-            document.getElementById("editModal").classList.remove("hidden");
-        }
-
-        function closeEditModal() {
-            document.getElementById("editModal").classList.add("hidden");
-        }
-    </script>
-
-
-
     <!-- ------------------------------ -->
     <!-- JAVASCRIPT LOGIC -->
     <!-- ------------------------------ -->
@@ -333,7 +209,6 @@
         function openCreateModal() {
             document.getElementById("createModal").classList.remove("hidden");
         }
-
         function closeCreateModal() {
             document.getElementById("createModal").classList.add("hidden");
         }
@@ -349,7 +224,6 @@
 
             document.getElementById("viewModal").classList.remove("hidden");
         }
-
         function closeViewModal() {
             document.getElementById("viewModal").classList.add("hidden");
         }
@@ -358,7 +232,6 @@
             document.getElementById("statusForm").action = `/admin/loans/${id}/status`;
             document.getElementById("statusModal").classList.remove("hidden");
         }
-
         function closeStatusModal() {
             document.getElementById("statusModal").classList.add("hidden");
         }
