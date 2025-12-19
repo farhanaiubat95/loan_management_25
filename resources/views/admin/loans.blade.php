@@ -1,7 +1,34 @@
 <x-admin-layout>
 
+    @php
+$actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-sm";
+    @endphp
+
+
     <!-- PAGE TITLE -->
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Loan Management</h1>
+
+
+    <!-- SEARCH & DOWNLOAD BAR -->
+    <div class="flex flex-wrap gap-3 items-center justify-between mb-6">
+    
+        <input type="text" id="loanSearch" placeholder="Search loan..." class="w-full md:w-80 px-3 py-2 border rounded">
+    
+        <div class="flex gap-2">
+            <button onclick="downloadCSV()" class="px-4 py-2 bg-yellow-600 text-white rounded">
+                Download CSV
+            </button>
+    
+            <button onclick="downloadLoanPDF()" class="px-4 py-2 bg-purple-600 text-white rounded">
+                Download PDF
+            </button>
+
+            <button onclick="openCreateModal()" class="px-4 py-2 bg-red-900 text-white rounded hover:bg-blue-700">
+                + Create Loan
+            </button>
+        </div>
+    
+    </div>
 
     <!-- SUCCESS MESSAGE -->
     @if (session('success'))
@@ -9,13 +36,6 @@
             {{ session('success') }}
         </div>
     @endif
-
-    <!-- TOP BAR -->
-    <div class="flex justify-end mb-4">
-        <button onclick="openCreateModal()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-            + Create Loan
-        </button>
-    </div>
 
     <!-- LOANS TABLE -->
     <div class="bg-white p-6 rounded-xl shadow border overflow-x-auto">
@@ -43,38 +63,66 @@
                         <td class="p-3">{{ $loan->interest_rate }}%</td>
                         <td class="p-3">{{ number_format($loan->emi, 2) }}</td>
                         <td class="p-3">
-                            <span
-                                class="px-2 py-1 rounded text-xs 
-                                @if ($loan->status == 'approved') bg-green-100 text-green-600
-                                @elseif($loan->status == 'rejected') bg-red-100 text-red-600
-                                @elseif($loan->status == 'paid') bg-blue-100 text-blue-700
-                                @else bg-yellow-100 text-yellow-700 @endif">
+                            <span class="px-2 py-1 rounded text-xs
+                            @if ($loan->status === 'pending') bg-yellow-100 text-yellow-700
+                            @elseif ($loan->status === 'approved') bg-green-100 text-green-700
+                            @elseif ($loan->status === 'active') bg-purple-100 text-purple-700
+                            @elseif ($loan->status === 'completed') bg-blue-100 text-blue-700
+                            @elseif ($loan->status === 'rejected') bg-red-100 text-red-700
+                            @endif">
                                 {{ ucfirst($loan->status) }}
                             </span>
-                        </td>
-
-                        <td class="px-3 py-5 text-right space-x-2 flex flex-row">
-                            <button onclick='openViewModal(@json($loan))'
-                                class="px-1 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                                <i class="fa fa-eye" aria-hidden="true"></i>
-                            </button>
-
-                            <button onclick='openEditModal(@json($loan))'
-                                class="px-1 py-1 bg-yellow-500 text-white rounded text-sm hover:bg-yellow-600">
-                                <i class="fas fa-edit"></i>
-                            </button>
-
-                            <button onclick='openStatusModal({{ $loan->id }})'
-                                class="px-1 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                <i class="fa-solid fa-layer-group"></i>
-                            </button>
-
-                            <button onclick='openDeleteModal({{ $loan->id }})'
-                                class="px-1 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
 
                         </td>
+                        <td class="px-3 py-5 flex gap-2 justify-center items-center">
+
+                            <!-- View -->
+                            <button onclick='openViewModal(@json($loan))' class="{{ $actionBtn }} bg-green-600 hover:bg-green-700">
+                                <i class="fa fa-eye"></i>
+                            </button>
+
+                            {{-- EDIT BUTTON --}}
+                            @if ($loan->status === 'pending' || $loan->status === 'approved')
+                                <button onclick='openEditModal(@json($loan))' class="{{ $actionBtn }} bg-yellow-500 hover:bg-yellow-600"
+                                    title="Edit Loan">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            @else
+                                <span class="{{ $actionBtn }} bg-gray-300 cursor-not-allowed" title="Editing disabled">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            @endif
+
+
+                            {{-- STATUS ACTION --}}
+                            @if (!in_array($loan->status, ['completed', 'rejected']))
+                                <button onclick='openStatusModal({{ $loan->id }}, "{{ $loan->status }}")'
+                                    class="{{ $actionBtn }} bg-blue-600 hover:bg-blue-700" title="Change Status">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                </button>
+                            @endif
+
+                            {{-- DELETE authentication  --}}
+                            @if(auth()->user()->role === 'admin')
+                                @if (!in_array($loan->status, ['active', 'completed']))
+                                <form action="{{ route('admin.loans.destroy', $loan->id) }}" method="POST" class="delete-form inline-flex">
+                                    @csrf
+                                    @method('DELETE')
+
+                                    <button type="button" class="{{ $actionBtn }} bg-red-600 hover:bg-red-700 mt-3" onclick="confirmDelete(this)">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                                @else
+                                    <button type="button" class="{{ $actionBtn }} cursor-not-allowed bg-gray-300" onclick="confirmDelete(this)" title="Cannot delete active/completed loan">
+                                        <i class="fa-solid fa-trash text-white "></i>
+                                    </button>
+                                @endif
+                            @endif
+
+
+                        </td>
+
                     </tr>
                 @endforeach
             </tbody>
@@ -193,12 +241,9 @@
 
             <form method="POST" id="statusForm">
                 @csrf
-                <select name="status" class="w-full p-2 border rounded mt-1">
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approve</option>
-                    <option value="rejected">Reject</option>
-                    <option value="paid">Mark as Paid</option>
+                <select name="status" id="statusSelect" class="w-full p-2 border rounded mt-1" required>
                 </select>
+
 
                 <button class="mt-6 px-6 py-2 bg-blue-600 text-white rounded">Update</button>
             </form>
@@ -214,6 +259,11 @@
         <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8 relative max-h-[90vh] overflow-y-auto">
 
             <h2 class="text-2xl font-bold mb-6">Edit Loan</h2>
+            <p class="text-sm text-gray-500 mb-4">
+                Editing mode:
+                <span class="font-semibold text-blue-600" id="edit_mode"></span>
+            </p>
+
 
             <form id="editForm" method="POST">
                 @csrf
@@ -260,19 +310,6 @@
         </div>
     </div>
 
-
-    <!-- ------------------------------ -->
-    <!-- DELETE LOAN ALERT -->
-    <!-- ------------------------------ -->
-    <script>
-        function openDeleteModal(id) {
-            if (confirm("Are you sure you want to delete this loan?")) {
-                window.location.href = "/admin/loans/" + id + "/delete";
-            }
-        }
-    </script>
-
-
     <!-- Edit Model -->
     <script>
         function calculateEMI(amount, interest, duration) {
@@ -300,44 +337,84 @@
 
         function openEditModal(loan) {
 
-            document.getElementById('e_amount').value = loan.amount;
-            document.getElementById('e_duration').value = loan.duration;
-            document.getElementById('e_interest').value = loan.interest_rate;
-            document.getElementById('e_description').value = loan.description ?? '';
+                const isPending = loan.status === 'pending';
+                const isApproved = loan.status === 'approved';
 
-            // Set EMI initially
-            document.getElementById('e_emi').value = loan.emi;
+                document.getElementById('e_amount').value = loan.amount;
+                document.getElementById('e_duration').value = loan.duration;
+                document.getElementById('e_interest').value = loan.interest_rate;
+                document.getElementById('e_description').value = loan.description ?? '';
+                document.getElementById('e_emi').value = loan.emi;
 
-            // Set form action
-            document.getElementById('editForm').action = `/admin/loans/${loan.id}`;
+                // Lock fields based on status
+                document.getElementById('e_amount').readOnly = !isPending;
+                document.getElementById('e_duration').readOnly = !isPending;
+                document.getElementById('e_interest').readOnly = !isPending;
 
-            // Auto update EMI on change
-            ['e_amount', 'e_duration', 'e_interest'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateEMIField);
-            });
+                // Description allowed for pending & approved
+                document.getElementById('e_description').readOnly = !(isPending || isApproved);
 
-            document.getElementById("editModal").classList.remove("hidden");
-        }
+                // EMI auto update only if pending
+                if (isPending) {
+                    ['e_amount', 'e_duration', 'e_interest'].forEach(id => {
+                        document.getElementById(id).addEventListener('input', updateEMIField);
+                    });
+                }
 
+                document.getElementById('editForm').action = `/admin/loans/${loan.id}`;
+                document.getElementById("editModal").classList.remove("hidden");
+                document.getElementById('edit_mode').innerText =
+                loan.status === 'pending' ? 'Full Edit Allowed' :
+                    loan.status === 'approved' ? 'Limited Edit (Description only)' :
+                        'Editing Locked';
+
+            }
+  
         function closeEditModal() {
             document.getElementById("editModal").classList.add("hidden");
         }
-    </script>
 
+
+        function openStatusModal(id, currentStatus) {
+
+                const select = document.getElementById('statusSelect');
+                select.innerHTML = '';
+
+                const transitions = {
+                    pending: ['approved', 'rejected'],
+                    approved: ['active'],
+                    active: ['completed'],
+                };
+
+                (transitions[currentStatus] || []).forEach(status => {
+                    let opt = document.createElement('option');
+                    opt.value = status;
+                    opt.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                    select.appendChild(opt);
+                });
+
+                document.getElementById("statusForm").action = `/admin/loans/${id}/status`;
+                document.getElementById("statusModal").classList.remove("hidden");
+            }
+
+    </script>
 
 
     <!-- ------------------------------ -->
     <!-- JAVASCRIPT LOGIC -->
     <!-- ------------------------------ -->
     <script>
+        // Open Create Modal
         function openCreateModal() {
             document.getElementById("createModal").classList.remove("hidden");
         }
 
+        // Close Create Modal
         function closeCreateModal() {
             document.getElementById("createModal").classList.add("hidden");
         }
 
+        // View Modal
         function openViewModal(loan) {
             document.getElementById("v_user").innerText = loan.user?.name;
             document.getElementById("v_amount").innerText = loan.amount;
@@ -350,18 +427,128 @@
             document.getElementById("viewModal").classList.remove("hidden");
         }
 
+        // Close View Modal
         function closeViewModal() {
             document.getElementById("viewModal").classList.add("hidden");
         }
 
+        // Open Status Modal
         function openStatusModal(id) {
             document.getElementById("statusForm").action = `/admin/loans/${id}/status`;
             document.getElementById("statusModal").classList.remove("hidden");
         }
 
+        // Close Status Modal
         function closeStatusModal() {
             document.getElementById("statusModal").classList.add("hidden");
         }
+
+        // Search
+        document.getElementById('loanSearch').addEventListener('keyup', function () {
+                let value = this.value.toLowerCase();
+                document.querySelectorAll("tbody tr").forEach(row => {
+                    row.style.display = row.innerText.toLowerCase().includes(value)
+                        ? ''
+                        : 'none';
+                });
+            });
+
+        // Download CSV
+        function downloadCSV() {
+                let rows = document.querySelectorAll("tbody tr");
+                let csv = [];
+
+                csv.push(["ID", "User", "Amount", "Duration", "Interest", "EMI", "Status"]);
+
+                rows.forEach(row => {
+                    if (row.style.display === "none") return;
+
+                    let cols = row.querySelectorAll("td");
+                    csv.push([
+                        cols[0].innerText,
+                        cols[1].innerText,
+                        cols[2].innerText,
+                        cols[3].innerText,
+                        cols[4].innerText,
+                        cols[5].innerText,
+                        cols[6].innerText
+                    ]);
+                });
+
+                let blob = new Blob([csv.map(e => e.join(",")).join("\n")],
+                    { type: "text/csv" });
+
+                let a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = "loans.csv";
+                a.click();
+            }
+
+
+            // Download PDF
+             function downloadLoanPDF() {
+
+                    let headers = [
+                        "ID",
+                        "Borrower",
+                        "Amount",
+                        "Duration",
+                        "Interest",
+                        "EMI",
+                        "Status"
+                    ];
+
+                    let rows = [];
+
+                    document.querySelectorAll("tbody tr").forEach(row => {
+                        if (row.style.display === "none") return; // respect search
+
+                        let cols = row.querySelectorAll("td");
+
+                        rows.push([
+                            cols[0].innerText,
+                            cols[1].innerText,
+                            cols[2].innerText,
+                            cols[3].innerText,
+                            cols[4].innerText,
+                            cols[5].innerText,
+                            cols[6].innerText
+                        ]);
+                    });
+
+                    generatePDF({
+                        title: "Loan Report",
+                        headers: headers,
+                        rows: rows
+                    });
+                }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    {{-- Delete Modal --}}
+    <script>
+        function confirmDelete(button) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This loan will be deleted!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    button.closest('form').submit();
+                }
+            });
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <script src="{{ asset('js/pdf-helper.js') }}"></script>
+
+
 
 </x-admin-layout>
