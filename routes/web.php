@@ -57,6 +57,7 @@ Route::prefix('admin')
         Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
         Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
 
+
         Route::post('/loans/{id}/status', [LoanController::class, 'updateStatus'])->name('loans.status');
 
         Route::get('/loans/{id}/schedule', [LoanController::class, 'schedule'])->name('admin.loans.schedule');
