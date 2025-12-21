@@ -12,7 +12,8 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
     <!-- SEARCH & DOWNLOAD BAR -->
     <div class="flex flex-wrap gap-3 items-center justify-between mb-6">
     
-        <input type="text" id="loanSearch" placeholder="Search loan..." class="w-full md:w-80 px-3 py-2 border rounded">
+        <input type="text" id="searchInput" placeholder="Search by Loan ID or Borrower Name"
+            class="border rounded px-3 py-2 w-64" />
     
         <div class="flex gap-2">
             <button onclick="downloadCSV()" class="px-4 py-2 bg-yellow-600 text-white rounded">
@@ -125,6 +126,12 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
 
                     </tr>
                 @endforeach
+                <tr id="noDataRow" class="hidden">
+                    <td colspan="8" class="text-center py-4 text-gray-500">
+                        No data present
+                    </td>
+                </tr>
+
             </tbody>
 
         </table>
@@ -433,10 +440,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
         }
 
         // Open Status Modal
-        function openStatusModal(id) {
-            document.getElementById("statusForm").action = `/admin/loans/${id}/status`;
-            document.getElementById("statusModal").classList.remove("hidden");
-        }
+
 
         // Close Status Modal
         function closeStatusModal() {
@@ -444,13 +448,36 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
         }
 
         // Search
-        document.getElementById('loanSearch').addEventListener('keyup', function () {
-                let value = this.value.toLowerCase();
-                document.querySelectorAll("tbody tr").forEach(row => {
-                    row.style.display = row.innerText.toLowerCase().includes(value)
-                        ? ''
-                        : 'none';
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('tbody tr:not(#noDataRow)');
+                const noDataRow = document.getElementById('noDataRow');
+
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+
+                    const loanId = row.children[0].innerText.toLowerCase();    // ID
+                    const borrower = row.children[1].innerText.toLowerCase(); // Borrower
+
+                    if (
+                        loanId.includes(filter) ||
+                        borrower.includes(filter)
+                    ) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
                 });
+
+                // No data present"
+                if (visibleCount === 0) {
+                    noDataRow.classList.remove('hidden');
+                } else {
+                    noDataRow.classList.add('hidden');
+                }
             });
 
         // Download CSV
