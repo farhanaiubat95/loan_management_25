@@ -12,7 +12,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
     <!-- SEARCH & DOWNLOAD BAR -->
     <div class="flex flex-wrap gap-3 items-center justify-between mb-6">
     
-        <input type="text" id="searchInput" placeholder="Search by Loan ID or Borrower Name"
+        <input type="text" id="searchInput" placeholder="Search by Loan ID or account number"
             class="border rounded px-3 py-2 w-64" />
     
         <div class="flex gap-2">
@@ -44,7 +44,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
             <thead>
                 <tr class="bg-gray-100 text-gray-700 border-b text-center">
                     <th class="p-3">ID</th>
-                    <th class="p-3">Borrower</th>
+                    <th class="p-3">Acc Num</th>
                     <th class="p-3">Amount</th>
                     <th class="p-3">Duration</th>
                     <th class="p-3">Interest</th>
@@ -58,7 +58,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 @foreach ($loans as $loan)
                     <tr class="border-b hover:bg-gray-50 text-center">
                         <td class="p-3">{{ $loan->id }}</td>
-                        <td class="p-3">{{ $loan->user->name }}</td>
+                        <td class="p-3">{{ $loan->user->account_number }}</td>
                         <td class="p-3">{{ number_format($loan->amount, 2) }}</td>
                         <td class="p-3">{{ $loan->duration }} months</td>
                         <td class="p-3">{{ $loan->interest_rate }}%</td>

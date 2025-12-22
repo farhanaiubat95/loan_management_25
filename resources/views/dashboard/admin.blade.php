@@ -1,5 +1,12 @@
 <x-admin-layout>
 
+    @php
+$totalUsers = \App\Models\User::where('role', 'user')->count();
+$totalLoans = \App\Models\Loan::whereIn('status', ['active', 'completed'])->count();
+$pendingLoans = \App\Models\Loan::where('status', 'pending')->count();
+    @endphp
+
+
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Admin Dashboard</h1>
 
     {{-- Top Stats Cards --}}
@@ -10,9 +17,9 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-700"><i class="fa-solid fa-user text-green-600"></i> Total
                     Users</h3>
-                <span class="text-green-600 text-xl font-bold">320</span>
+                <span class="text-green-600 text-xl font-bold">{{ $totalUsers }}</span>
             </div>
-            <p class="text-sm text-gray-500 mt-2">Borrowers + Managers</p>
+            <p class="text-sm text-gray-500 mt-2">Borrowers</p>
         </div>
 
         {{-- Total Loans --}}
@@ -20,7 +27,7 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-700"><i class="fas fa-hand-holding-usd text-blue-600"></i>
                     Total Loans</h3>
-                <span class="text-blue-600 text-xl font-bold">125</span>
+                <span class="text-blue-600 text-xl font-bold">{{ $totalLoans }}</span>
             </div>
             <p class="text-sm text-gray-500 mt-2">Active + Completed Loans</p>
         </div>
@@ -30,7 +37,7 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-semibold text-gray-700"><i class="fa-solid fa-circle-check text-yellow-500"></i>
                     Pending Approvals</h3>
-                <span class="text-yellow-500 text-xl font-bold">14</span>
+                <span class="text-yellow-500 text-xl font-bold">{{ $pendingLoans }}</span>
             </div>
             <p class="text-sm text-gray-500 mt-2">Waiting for admin review</p>
         </div>
@@ -56,46 +63,43 @@
                 </thead>
 
                 <tbody>
-                    <tr class="border-b">
-                        <td class="p-3">Mahmud Hasan</td>
-                        <td class="p-3">৳50,000</td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded bg-yellow-100 text-yellow-700 text-xs">
-                                Pending
-                            </span>
-                        </td>
-                        <td class="p-3 text-right">
-                            <a href="#" class="text-blue-600 hover:underline">View</a>
-                        </td>
-                    </tr>
+                    @forelse ($recentLoans as $loan)
+                        @if ($loan->status === 'active')
+                            <tr class="border-b">
+                                <td class="p-3">{{ $loan->user->name }}</td>
 
-                    <tr class="border-b">
-                        <td class="p-3">Fahim Rahman</td>
-                        <td class="p-3">৳30,000</td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs">
-                                Approved
-                            </span>
-                        </td>
-                        <td class="p-3 text-right">
-                            <a href="#" class="text-blue-600 hover:underline">View</a>
-                        </td>
-                    </tr>
+                                <td class="p-3">৳{{ number_format($loan->amount) }}</td>
 
-                    <tr class="border-b">
-                        <td class="p-3">Jannat Akter</td>
-                        <td class="p-3">৳75,000</td>
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded bg-red-100 text-red-700 text-xs">
-                                Rejected
-                            </span>
-                        </td>
-                        <td class="p-3 text-right">
-                            <a href="#" class="text-blue-600 hover:underline">View</a>
-                        </td>
-                    </tr>
+                                <td class="p-3">
+                                    <span class="px-2 py-1 rounded text-xs
+                                        @if($loan->status === 'pending') bg-yellow-100 text-yellow-700
+                                        @elseif($loan->status === 'approved') bg-green-100 text-green-700
+                                        @elseif($loan->status === 'active') bg-purple-100 text-purple-700
+                                        @elseif($loan->status === 'completed') bg-blue-100 text-blue-700
+                                        @elseif($loan->status === 'rejected') bg-red-100 text-red-700
+                                        @endif">
+                                        {{ ucfirst($loan->status) }}
+                                    </span>
+                                </td>
 
+                                <td class="p-3 text-right">
+                                    <a href="{{ route('admin.loans') }}" class="text-blue-600 hover:underline">
+                                        View
+                                    </a>
+
+                                </td>
+                            </tr>
+
+                        @endif
+                    @empty
+                        <tr>
+                            <td colspan="4" class="p-4 text-center text-gray-500">
+                                No loan data available
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
+
             </table>
         </div>
 
@@ -105,29 +109,46 @@
             <h2 class="text-xl font-semibold text-gray-700 mb-4">Recent Activity</h2>
 
             <ul class="space-y-4">
+            
+                @forelse ($recentLoans as $loan)
 
-                <li class="flex items-start">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <p class="ml-3 text-gray-600 text-sm">
-                        New loan application submitted by <strong>Mahmud Hasan</strong>.
-                    </p>
-                </li>
+                    <li class="flex items-start">
+                        <div class="w-2 h-2 rounded-full mt-2
+                                @if($loan->status === 'pending') bg-yellow-500
+                                @elseif($loan->status === 'approved') bg-green-500
+                                @elseif($loan->status === 'active') bg-purple-500
+                                @elseif($loan->status === 'completed') bg-blue-500
+                                @elseif($loan->status === 'rejected') bg-red-500
+                                @endif
+                            "></div>
 
-                <li class="flex items-start">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <p class="ml-3 text-gray-600 text-sm">
-                        Loan of <strong>৳30,000</strong> approved for <strong>Fahim Rahman</strong>.
-                    </p>
-                </li>
+                        <p class="ml-3 text-gray-600 text-sm">
+                            @if($loan->status === 'pending')
+                                New loan application submitted by
+                                <strong>{{ $loan->user->name }}</strong>.
+                            @elseif($loan->status === 'approved')
+                                Loan of <strong>৳{{ number_format($loan->amount) }}</strong>
+                                approved for <strong>{{ $loan->user->name }}</strong>.
+                            @elseif($loan->status === 'completed')
+                                Loan of <strong>৳{{ number_format($loan->amount) }}</strong>
+                                completed by <strong>{{ $loan->user->name }}</strong>.
+                            @elseif($loan->status === 'rejected')
+                                Loan application rejected for
+                                <strong>{{ $loan->user->name }}</strong>.
+                            @else
+                                Loan updated for <strong>{{ $loan->user->name }}</strong>.
+                            @endif
+                        </p>
+                    </li>
 
-                <li class="flex items-start">
-                    <div class="w-2 h-2 bg-yellow-500 rounded-full mt-2"></div>
-                    <p class="ml-3 text-gray-600 text-sm">
-                        4 new users registered.
-                    </p>
-                </li>
-
+                @empty
+                    <li class="text-gray-500 text-sm text-center">
+                        No recent activity available
+                    </li>
+                @endforelse
+            
             </ul>
+
         </div>
 
     </div>

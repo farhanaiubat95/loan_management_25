@@ -10,6 +10,7 @@
             <thead>
                 <tr class="bg-gray-100 text-gray-700 text-sm border-b text-center">
                     <th class="p-3">ID</th>
+                    <th class="p-3">Acc Num</th>
                     <th class="p-3">Name</th>
                     <th class="p-3">Email</th>
                     <th class="p-3">NID</th>
@@ -28,6 +29,7 @@
                 @forelse ($onlyUsers as $user)
                     <tr class="border-b hover:bg-gray-50 text-center">
                         <td class="p-3">{{ $user->id }}</td>
+                        <td class="p-3">{{ $user->account_number }}</td>
                         <td class="p-3">{{ $user->name }}</td>
                         <td class="p-3">{{ $user->email }}</td>
                         <td class="p-3">{{ $user->nid }}</td>

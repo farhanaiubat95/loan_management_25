@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\AdminController\AdminUserController; 
+use App\Http\Controllers\AdminController\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\LoanController;
 
 Route::get('/', function () {
@@ -25,16 +26,40 @@ Route::middleware(['auth'])->group(function () {
         ->name('profile.destroy');
 });
 
-// Route::prefix('admin')->middleware(['auth', 'admin'])->name('admin.')->group(function () {
-//     Route::get('/dashboard', function () {
-//         return view('dashboard.admin');
-//     })->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| USER ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'user'])
+    ->prefix('user')
+    ->name('user.')
+    ->group(function () {
 
-//     Route::view('/users', 'admin.users')->name('users');
-//     Route::view('/loans', 'admin.loans')->name('loans');
-//     Route::view('/settings', 'admin.settings')->name('settings');
-// });
+        Route::get('/dashboard', function () {
+            return view('dashboard.user');
+        })->name('dashboard');
+    });
 
+
+/*
+|--------------------------------------------------------------------------
+| MANAGER ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'manager'])
+    ->prefix('manager')
+    ->name('manager.')
+    ->group(function () {
+
+        Route::get('/dashboard', function () {
+            return view('dashboard.manager');
+        })->name('dashboard');
+    });
+
+  
+
+// Admin Routes
 Route::prefix('admin')
     ->middleware(['auth', 'admin'])
     ->name('admin.')
@@ -43,6 +68,9 @@ Route::prefix('admin')
         Route::get('/dashboard', function () {
             return view('dashboard.admin');
         })->name('dashboard');
+
+         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
+            ->name('dashboard');
 
         // USERS
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
@@ -57,7 +85,6 @@ Route::prefix('admin')
         Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
         Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
 
-
         Route::post('/loans/{id}/status', [LoanController::class, 'updateStatus'])->name('loans.status');
 
         Route::get('/loans/{id}/schedule', [LoanController::class, 'schedule'])->name('admin.loans.schedule');
@@ -69,6 +96,6 @@ Route::prefix('admin')
         Route::view('/settings', 'admin.settings')->name('settings');
     });
 
-
+// 
 
 require __DIR__.'/auth.php';
