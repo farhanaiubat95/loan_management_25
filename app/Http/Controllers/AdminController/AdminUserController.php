@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\AdminController;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class AdminUserController extends Controller
 {
@@ -58,4 +59,5 @@ class AdminUserController extends Controller
 
         return redirect()->back()->with('success', 'User deleted successfully!');
     }
+
 }

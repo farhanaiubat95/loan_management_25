@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -18,6 +19,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+    'account_number',
     'name',
     'email',
     'phone',
@@ -54,4 +56,22 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    
+
+protected static function booted()
+{
+    static::creating(function ($user) {
+
+        // Lock table to avoid duplicate numbers
+        $lastNumber = DB::table('users')
+            ->lockForUpdate()
+            ->where('account_number', 'like', 'LONE%')
+            ->max(DB::raw("CAST(SUBSTRING(account_number, 5) AS UNSIGNED)"));
+
+        $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
+
+        $user->account_number = 'LONE' . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+    });
+}
 }
