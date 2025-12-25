@@ -50,12 +50,13 @@ $pendingLoans = \App\Models\Loan::where('status', 'pending')->count();
 
         {{-- Loan Overview --}}
         <div class="bg-white p-6 shadow rounded-xl border lg:col-span-2">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Loan Overview</h2>
+            <h2 class="text-xl font-semibold text-gray-700 mb-4">Loan Overview (Active Loan)</h2>
 
             <table class="w-full border-collapse text-left">
                 <thead>
                     <tr class="bg-gray-100 text-gray-700 text-sm border-b">
                         <th class="p-3">Borrower</th>
+                        <th class="p-3">Acc Num</th>
                         <th class="p-3">Amount</th>
                         <th class="p-3">Status</th>
                         <th class="p-3 text-right">Action</th>
@@ -67,6 +68,8 @@ $pendingLoans = \App\Models\Loan::where('status', 'pending')->count();
                         @if ($loan->status === 'active')
                             <tr class="border-b">
                                 <td class="p-3">{{ $loan->user->name }}</td>
+
+                                <td class="p-3">{{ $loan->user->account_number }}</td>
 
                                 <td class="p-3">৳{{ number_format($loan->amount) }}</td>
 

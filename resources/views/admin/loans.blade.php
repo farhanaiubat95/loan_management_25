@@ -12,7 +12,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
     <!-- SEARCH & DOWNLOAD BAR -->
     <div class="flex flex-wrap gap-3 items-center justify-between mb-6">
     
-        <input type="text" id="searchInput" placeholder="Search by Loan ID or account number"
+        <input type="text" id="searchInput" placeholder="Search by account number"
             class="border rounded px-3 py-2 w-64" />
     
         <div class="flex gap-2">
@@ -439,16 +439,13 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
             document.getElementById("viewModal").classList.add("hidden");
         }
 
-        // Open Status Modal
-
-
         // Close Status Modal
         function closeStatusModal() {
             document.getElementById("statusModal").classList.add("hidden");
         }
 
         // Search
-        document.getElementById('searchInput').addEventListener('keyup', function () {
+            document.getElementById('searchInput').addEventListener('keyup', function () {
 
                 const filter = this.value.toLowerCase();
                 const rows = document.querySelectorAll('tbody tr:not(#noDataRow)');
@@ -458,13 +455,10 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
 
                 rows.forEach(row => {
 
-                    const loanId = row.children[0].innerText.toLowerCase();    // ID
-                    const borrower = row.children[1].innerText.toLowerCase(); // Borrower
+                    // account number is in column index 1
+                    const accountNumber = row.children[1].innerText.toLowerCase();
 
-                    if (
-                        loanId.includes(filter) ||
-                        borrower.includes(filter)
-                    ) {
+                    if (accountNumber.includes(filter)) {
                         row.style.display = '';
                         visibleCount++;
                     } else {
@@ -472,7 +466,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                     }
                 });
 
-                // No data present"
+                // Show "No data" row if nothing matches
                 if (visibleCount === 0) {
                     noDataRow.classList.remove('hidden');
                 } else {

@@ -29,6 +29,12 @@
                     Loans
                 </a>
 
+                <a href="{{ route('admin.reports') }}"
+                    class="block px-4 py-2 rounded
+                    {{ request()->routeIs('admin.reports') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                    Reports
+                </a>
+
             </nav>
         </aside>
 
