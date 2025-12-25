@@ -74,4 +74,9 @@ protected static function booted()
         $user->account_number = 'LONE' . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
     });
 }
+
+public function loans()
+    {
+        return $this->hasMany(Loan::class);
+    }
 }
