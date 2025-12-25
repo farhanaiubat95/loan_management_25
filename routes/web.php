@@ -93,7 +93,7 @@ Route::prefix('admin')
 
 
         // SETTINGS
-        Route::view('/settings', 'admin.settings')->name('settings');
+        Route::view('/reports', 'admin.reports')->name('settings');
     });
 
 // 
