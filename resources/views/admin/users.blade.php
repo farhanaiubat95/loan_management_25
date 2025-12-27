@@ -3,6 +3,32 @@
     {{-- PAGE TITLE --}}
     <h1 class="text-2xl font-bold mb-6 text-gray-800">Users List</h1>
 
+    {{-- TOP BAR --}}
+    <div class="flex flex-wrap gap-4 justify-between items-center mb-6">
+
+    {{-- SEARCH & ACTION BAR --}}
+    <div class="flex flex-wrap gap-3 items-center justify-between mb-6">
+
+    {{-- SEARCH INPUT --}}
+    <input type="text" id="searchInput"
+        placeholder="Search by account number"
+        class="border rounded px-3 py-2 w-64" />
+
+    </div>
+
+
+    {{-- CREATE USER BUTTON --}}
+    <div class="flex justify-end mb-4">
+        <button onclick="openCreateUserModal()"
+            class="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            + Create User Account
+        </button>
+    </div>
+
+        
+
+    </div>
+
     {{-- USERS TABLE --}}
     <div class="bg-white p-6 rounded-xl shadow border overflow-y-auto max-h-[70vh]">
 
@@ -16,6 +42,7 @@
                     <th class="p-3">NID</th>
                     <th class="p-3">Phone Number</th>
                     <th class="p-3">Role</th>
+                    <th class="p-3">Status</th>
                     <th class="p-3">Action</th>
                 </tr>
             </thead>
@@ -23,41 +50,93 @@
             <tbody>
                 {{-- ONLY USERS Role --}}
                 @php
-                    $onlyUsers = $users->where('role', 'user');
+$onlyUsers = $users->where('role', 'user');
                 @endphp
 
                 @forelse ($onlyUsers as $user)
-                    <tr class="border-b hover:bg-gray-50 text-center">
-                        <td class="p-3">{{ $user->id }}</td>
-                        <td class="p-3">{{ $user->account_number }}</td>
-                        <td class="p-3">{{ $user->name }}</td>
-                        <td class="p-3">{{ $user->email }}</td>
-                        <td class="p-3">{{ $user->nid }}</td>
-                        <td class="p-3">{{ $user->phone }}</td>
+                                                                                                                                                                                        <tr class="border-b text-center 
+                                                                                                                {{ $user->status === 'rejected' ? 'bg-gray-100 text-gray-400' : 'hover:bg-gray-50' }}">
 
-                        <td class="p-3">
-                            <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs">
-                                {{ $user->role }}
-                            </span>
-                        </td>
 
-                        <td class="px-3 space-x-2 flex flex-row py-5">
-                            <button onclick='openViewModal(@json($user))'
-                                class="px-1 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                                <i class="fa fa-eye" aria-hidden="true"></i>
-                            </button>
+                                                                                                                                                                                            <td class="p-3">{{ $user->id }}</td>
+                                                                                                                                                                                            <td class="p-3">{{ $user->account_number }}</td>
+                                                                                                                                                                                            <td class="p-3">{{ $user->name }}</td>
+                                                                                                                                                                                            <td class="p-3">{{ $user->email }}</td>
+                                                                                                                                                                                            <td class="p-3">{{ $user->nid }}</td>
+                                                                                                                                                                                            <td class="p-3">{{ $user->phone }}</td>
 
-                            <button onclick='openEditModal(@json($user))'
-                                class="px-1 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                                                                                                                                                                                            <td class="p-3">
+                                                                                                                                                                                                <span class="px-2 py-1 rounded bg-blue-100 text-blue-700 text-xs">
+                                                                                                                                                                                                    {{ $user->role }}
+                                                                                                                                                                                                </span>
+                                                                                                                                                                                            </td>
+                                                                                                                                                                                            <td class="p-3">
+                                                                                                                                                                                                <span class="px-2 py-1 rounded text-xs font-semibold
+                                                                                                                                                                                                    @if($user->status === 'active') bg-green-100 text-green-700
+                                                                                                                                                                                                    @elseif($user->status === 'inactive') bg-yellow-100 text-yellow-700
+                                                                                                                                                                                                    @elseif($user->status === 'blocked') bg-orange-100 text-orange-700
+                                                                                                                                                                                                    @elseif($user->status === 'rejected') bg-red-100 text-red-700
+                                                                                                                                                                                                    @endif">
+                                                                                                                                                                                                    {{ ucfirst($user->status) }}
+                                                                                                                                                                                                </span>
+                                                                                                                                                                                            </td>
 
-                            <button onclick='confirmDelete({{ $user->id }}, @json($user->name))'
-                                class="px-1 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
+                                                                                                                                                                                            <td class="px-3 py-5 space-x-2 flex flex-row justify-center">
+
+                                                                                                {{-- VIEW --}}
+                                                                                                <button
+                                                                            @if($user->status !== 'rejected')
+                                                                                onclick='openViewModal(@json($user))'
+                                                                            @endif
+                                                                            class="px-1 py-1 rounded text-sm
+                                                                                {{ $user->status === 'rejected'
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-green-600 text-white hover:bg-green-700' }}"
+                                                                            {{ $user->status === 'rejected' ? 'disabled' : '' }}>
+                                                                            <i class="fa fa-eye"></i>
+                                                                        </button>
+
+                                                                                                {{-- EDIT --}}
+                                                                                                <button
+                                                        @if(!in_array($user->status, ['blocked', 'rejected']))
+                                                            onclick='openEditModal(@json($user))'
+                                                        @endif
+                                                        class="px-1 py-1 rounded text-sm
+                                                            {{ in_array($user->status, ['blocked', 'rejected'])
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-blue-600 text-white hover:bg-blue-700' }}"
+                                                        {{ in_array($user->status, ['blocked', 'rejected']) ? 'disabled' : '' }}>
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
+
+                                                                                                {{-- STATUS (HIDDEN IF REJECTED) --}}
+                                                                                                @if($user->status !== 'rejected')
+                                                                                                    <button
+                                                                                                        onclick="openStatusModal({{ $user->id }}, '{{ $user->status }}')"
+                                                                                                        class="px-1 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700">
+                                                                                                        <i class="fa-solid fa-layer-group"></i>
+                                                                                                    </button>
+                                                                                                @endif
+
+
+                                                                                                {{-- DELETE --}}
+                                                                                                <button
+                        @if(!in_array($user->status, ['blocked', 'rejected']))
+                            onclick="confirmDelete({{ $user->id }}, '{{ $user->name }}')"
+                        @endif
+                        class="px-1 py-1 rounded text-sm
+                            {{ in_array($user->status, ['blocked', 'rejected'])
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : 'bg-red-600 text-white hover:bg-red-700' }}"
+                        {{ in_array($user->status, ['blocked', 'rejected']) ? 'disabled' : '' }}>
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+
+
+                                                                                            </td>
+
+                                                                                                                                                                                        </tr>
 
                 @empty
                     <tr>
@@ -66,6 +145,13 @@
                         </td>
                     </tr>
                 @endforelse
+
+                <tr id="noDataRow" class="hidden">
+                    <td colspan="8" class="p-6 text-center text-gray-500 font-medium">
+                        No matching users found.
+                    </td>
+                </tr>
+
             </tbody>
         </table>
     </div>
@@ -242,9 +328,119 @@
         </div>
     </div>
 
-    {{-- -------------------------------- --}}
+    {{-- CREATE USER ACCOUNT MODAL --}}
+<div id="createUserModal"
+    class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
+
+    <div class="bg-white w-full max-w-5xl rounded-2xl shadow-xl p-8 relative max-h-[90vh] overflow-y-auto">
+
+        <button onclick="closeCreateUserModal()"
+            class="absolute top-3 right-4 text-gray-600 hover:text-black text-2xl">&times;</button>
+
+        <h2 class="text-2xl font-bold mb-6 border-b pb-3">Create User Account</h2>
+
+        <form method="POST" action="{{ route('admin.users.store') }}" enctype="multipart/form-data">
+            @csrf
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div>
+                    <label>Full Name</label>
+                    <input type="text" name="name" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label>Email</label>
+                    <input type="email" name="email" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label>Phone</label>
+                    <input type="text" name="phone" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>Password</label>
+                    <input type="password" name="password" class="w-full p-2 border rounded" required>
+                </div>
+
+                <div>
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>NID Number</label>
+                    <input type="text" name="nid" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>NID Image</label>
+                    <input type="file" name="nid_image" class="w-full p-2 border rounded">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label>Address</label>
+                    <input type="text" name="address" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>Occupation</label>
+                    <input type="text" name="occupation" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>Monthly Income</label>
+                    <input type="number" name="income" class="w-full p-2 border rounded">
+                </div>
+
+                <div>
+                    <label>Role</label>
+                    <select name="role" class="w-full p-2 border rounded">
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button class="mt-6 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Create Account
+            </button>
+        </form>
+
+    </div>
+</div>
+
+<div id="statusModal"
+    class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center">
+
+    <div class="bg-white rounded-xl shadow-xl p-6 w-96 relative">
+        <h2 class="text-xl font-bold mb-4">Update User Status</h2>
+
+        <form method="POST" id="statusForm">
+            @csrf
+
+            <select name="status" id="statusSelect"
+                class="w-full p-2 border rounded mb-4">
+                <option value="inactive">Inactive (Pending)</option>
+                <option value="active">Active (Approved)</option>
+                <option value="blocked">Blocked</option>
+                <option value="rejected">Rejected</option>
+            </select>
+
+            <button class="w-full bg-blue-600 text-white py-2 rounded">
+                Update Status
+            </button>
+        </form>
+
+        <button onclick="closeStatusModal()"
+            class="absolute top-3 right-4 text-xl">&times;</button>
+    </div>
+</div>
+
+
     {{-- JAVASCRIPT LOGIC --}}
-    {{-- -------------------------------- --}}
     <script>
         function openViewModal(user) {
             document.getElementById("view_name").innerText = user.name ?? '';
@@ -270,7 +466,6 @@
         function closeViewModal() {
             document.getElementById("viewModal").classList.add("hidden");
         }
-
 
         function closeViewModal() {
             document.getElementById("viewModal").classList.add("hidden");
@@ -313,13 +508,107 @@
             form.action = `/admin/users/${id}`;
 
             form.innerHTML = `
-        @csrf
-        <input type="hidden" name="_method" value="DELETE">
-    `;
+                @csrf
+                <input type="hidden" name="_method" value="DELETE">
+            `;
 
             document.body.appendChild(form);
             form.submit();
         }
+
+        // Create account
+        function openCreateUserModal() {
+            document.getElementById('createUserModal').classList.remove('hidden');
+        }
+
+        function openStatusModal(userId, currentStatus) {
+        document.getElementById('statusForm').action = `/admin/users/${userId}/status`;
+        document.getElementById('statusSelect').value = currentStatus;
+        document.getElementById('statusModal').classList.remove('hidden');
+    }
+
+    function closeStatusModal() {
+        document.getElementById('statusModal').classList.add('hidden');
+    }
+
+        function closeCreateUserModal() {
+            document.getElementById('createUserModal').classList.add('hidden');
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', function () {
+
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr:not(#noDataRow)');
+        const noDataRow = document.getElementById('noDataRow');
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            // Account Number column index = 1
+            const accountNumber = row.children[1].innerText.toLowerCase();
+
+            if (accountNumber.includes(filter)) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Show "No data found"
+        if (visibleCount === 0) {
+            noDataRow.classList.remove('hidden');
+        } else {
+            noDataRow.classList.add('hidden');
+        }
+    });
+
+
+    function openStatusModal(userId, currentStatus) {
+
+    const select = document.getElementById('statusSelect');
+    const form = document.getElementById('statusForm');
+
+    // Reset: show all options first
+    Array.from(select.options).forEach(opt => opt.hidden = false);
+
+    // BUSINESS RULES
+    if (currentStatus === 'active') {
+        // Active → only allowed to stay active or go blocked
+        select.querySelector('option[value="inactive"]').hidden = true;
+        select.querySelector('option[value="rejected"]').hidden = true;
+    }
+
+    if (currentStatus === 'rejected') {
+        // Rejected → cannot go back
+        select.querySelector('option[value="inactive"]').hidden = true;
+        select.querySelector('option[value="active"]').hidden = true;
+        select.querySelector('option[value="blocked"]').hidden = true;
+    }
+
+    if (currentStatus === 'blocked') {
+        // Blocked → can only be active or stay blocked
+        select.querySelector('option[value="inactive"]').hidden = true;
+        select.querySelector('option[value="rejected"]').hidden = true;
+    }
+
+    
+
+    // Set selected value
+    select.value = currentStatus;
+
+    // Set form action
+    form.action = `/admin/users/${userId}/status`;
+
+    // Show modal
+    document.getElementById('statusModal').classList.remove('hidden');
+}
+
+function closeStatusModal() {
+    document.getElementById('statusModal').classList.add('hidden');
+}
     </script>
+
+
 
 </x-admin-layout>

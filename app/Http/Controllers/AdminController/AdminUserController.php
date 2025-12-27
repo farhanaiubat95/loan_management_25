@@ -14,6 +14,42 @@ class AdminUserController extends Controller
         return view('admin.users', compact('users'));
     }
 
+    // create
+    public function store(Request $request)
+    {
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+        'nid_image' => 'nullable|image|max:2048',
+    ]);
+
+    $nidImagePath = null;
+    if ($request->hasFile('nid_image')) {
+        $nidImagePath = $request->file('nid_image')->store('nid_images', 'public');
+    }
+
+    User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'dob' => $request->dob,
+        'nid' => $request->nid,
+        'nid_image' => $nidImagePath,
+        'address' => $request->address,
+        'occupation' => $request->occupation,
+        'income' => $request->income,
+        'role' => $request->role ?? 'user',
+        'account_number' => 'ACC' . rand(10000000, 99999999),
+        'status' => 'active',
+        'password' => bcrypt($request->password),
+    ]);
+
+    return back()->with('success', 'User account created successfully.');
+    }
+
+
+    // Update
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -52,6 +88,21 @@ class AdminUserController extends Controller
         return redirect()->back()->with('success', 'User updated successfully!');
     }
 
+    public function updateStatus(Request $request, $id)
+{
+    $request->validate([
+        'status' => 'required|in:inactive,active,blocked,rejected',
+    ]);
+
+    $user = User::findOrFail($id);
+    $user->status = $request->status;
+    $user->save();
+
+    return back()->with('success', 'User status updated successfully.');
+}
+
+
+    // Destroy
     public function destroy($id)
     {
         $user = User::findOrFail($id);

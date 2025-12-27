@@ -76,6 +76,9 @@ Route::prefix('admin')
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
         Route::put('/users/{id}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{id}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::post('/users/{id}/status', [AdminUserController::class, 'updateStatus'])->name('users.status');
+
 
         // LOANS (Corrected)
         Route::get('/loans', [LoanController::class, 'index'])->name('loans');
