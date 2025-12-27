@@ -45,6 +45,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 <tr class="bg-gray-100 text-gray-700 border-b text-center">
                     <th class="p-3">ID</th>
                     <th class="p-3">Acc Num</th>
+                    <th class="p-3">Loan Type</th>
                     <th class="p-3">Amount</th>
                     <th class="p-3">Duration</th>
                     <th class="p-3">Interest</th>
@@ -59,6 +60,16 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                     <tr class="border-b hover:bg-gray-50 text-center">
                         <td class="p-3">{{ $loan->id }}</td>
                         <td class="p-3">{{ $loan->user->account_number }}</td>
+                        <td class="p-3">
+                            <span class="px-2 py-1 rounded text-xs
+                                @if ($loan->loan_type === 'personal') font-semibold text-green-500
+                                @elseif ($loan->loan_type === 'business') font-semibold text-pink-900
+                                @elseif ($loan->loan_type === 'education') font-semibold text-purple-900
+                                @elseif ($loan->loan_type === 'home') font-semibold text-blue-900
+                                @endif">
+                                {{ ucfirst($loan->loan_type) }}
+                            </span>
+                        </td>
                         <td class="p-3">{{ number_format($loan->amount, 2) }}</td>
                         <td class="p-3">{{ $loan->duration }} months</td>
                         <td class="p-3">{{ $loan->interest_rate }}%</td>
@@ -208,6 +219,11 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 <div><strong>User:</strong>
                     <p id="v_user"></p>
                 </div>
+
+                <div><strong>Loan Type:</strong>
+                    <p id="v_loanType"></p>
+                </div>
+
                 <div><strong>Amount:</strong>
                     <p id="v_amount"></p>
                 </div>
@@ -235,7 +251,6 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 class="absolute top-4 right-4 text-xl text-gray-600 hover:text-black">&times;</button>
         </div>
     </div>
-
 
 
     <!-- ------------------------------ -->
@@ -277,6 +292,17 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 @method('PUT')
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block font-medium">Loan Type</label>
+                        <select name="loan_type" id="e_loanType" class="w-full p-2 border rounded mt-1">
+                            <option value="">Select Loan Type</option>
+                            <option value="personal">Personal Loan</option>
+                            <option value="business">Business Loan</option>
+                            <option value="education">Education Loan</option>
+                            <option value="home">Home Loan</option>
+                        </select>
+                    </div>
+
 
                     <div>
                         <label>Loan Amount</label>
@@ -348,6 +374,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 const isApproved = loan.status === 'approved';
 
                 document.getElementById('e_amount').value = loan.amount;
+                document.getElementById('e_loanType').value = loan.loan_type;
                 document.getElementById('e_duration').value = loan.duration;
                 document.getElementById('e_interest').value = loan.interest_rate;
                 document.getElementById('e_description').value = loan.description ?? '';
@@ -357,6 +384,9 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                 document.getElementById('e_amount').readOnly = !isPending;
                 document.getElementById('e_duration').readOnly = !isPending;
                 document.getElementById('e_interest').readOnly = !isPending;
+
+                // Loan type: editable ONLY when pending
+                document.getElementById('e_loanType').disabled = !isPending;
 
                 // Description allowed for pending & approved
                 document.getElementById('e_description').readOnly = !(isPending || isApproved);
@@ -424,6 +454,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
         // View Modal
         function openViewModal(loan) {
             document.getElementById("v_user").innerText = loan.user?.name;
+            document.getElementById("v_loanType").innerText = loan.loan_type;
             document.getElementById("v_amount").innerText = loan.amount;
             document.getElementById("v_duration").innerText = loan.duration + " months";
             document.getElementById("v_interest").innerText = loan.interest_rate + "%";

@@ -27,6 +27,7 @@ class LoanController extends Controller
     {
         $request->validate([
             'user_id'        => 'required|exists:users,id',
+            'loan_type'      => 'required|string|max:50',
             'amount'         => 'required|numeric|min:1',
             'duration'       => 'required|integer|min:1',
             'interest_rate'  => 'required|numeric|min:0',
@@ -43,6 +44,7 @@ class LoanController extends Controller
         // Create loan (IMPORTANT: pending)
         $loan = Loan::create([
             'user_id'       => $request->user_id,
+            'loan_type'     => $request->loan_type,
             'amount'        => $P,
             'duration'      => $n,
             'interest_rate' => $request->interest_rate,
@@ -91,6 +93,7 @@ class LoanController extends Controller
     $emi = ($P * $r * pow(1 + $r, $n)) / (pow(1 + $r, $n) - 1);
 
     $loan->update([
+        'loan_type'     => $request->loan_type,
         'amount'        => $P,
         'duration'      => $n,
         'interest_rate' => $request->interest_rate,
