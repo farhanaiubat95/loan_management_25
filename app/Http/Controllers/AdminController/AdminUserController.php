@@ -6,103 +6,128 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+// OTP related
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use App\Mail\UserOtpMail;
+use Carbon\Carbon;
+
 class AdminUserController extends Controller
 {
     public function index()
     {
         $users = User::all();
+
         return view('admin.users', compact('users'));
     }
 
-    // create
-    public function store(Request $request)
-    {
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users',
-        'password' => 'required|min:6',
-        'nid_image' => 'nullable|image|max:2048',
-    ]);
-
-    $nidImagePath = null;
-    if ($request->hasFile('nid_image')) {
-        $nidImagePath = $request->file('nid_image')->store('nid_images', 'public');
-    }
-
-    User::create([
-        'name' => $request->name,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'dob' => $request->dob,
-        'nid' => $request->nid,
-        'nid_image' => $nidImagePath,
-        'address' => $request->address,
-        'occupation' => $request->occupation,
-        'income' => $request->income,
-        'role' => $request->role ?? 'user',
-        'account_number' => 'ACC' . rand(10000000, 99999999),
-        'status' => 'active',
-        'password' => bcrypt($request->password),
-    ]);
-
-    return back()->with('success', 'User account created successfully.');
-    }
-
-
-    // Update
-    public function update(Request $request, $id)
+    // ==============================
+    // SEND OTP
+    // ==============================
+    public function sendOtp(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|max:255|unique:users,email,' . $id,
-            'phone'       => 'required|string|max:20',
-            'dob'         => 'required|date',
-            'nid'         => 'required|string|max:50',
-            'address'     => 'required|string|max:500',
-            'occupation'  => 'required|string|max:255',
-            'income'      => 'required|numeric',
-            'role'        => 'required|in:user,manager,admin',
-            'nid_image'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'email' => 'required|email|unique:users,email'
+        ]);
+
+        $otp = rand(100000, 999999);
+
+        DB::table('email_otps')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'otp'         => $otp,
+                'expires_at'  => now()->addMinutes(5),
+                'updated_at'  => now(),
+                'created_at'  => now(),
+            ]
+        );
+
+        Mail::to($request->email)->send(new UserOtpMail($otp));
+
+        return response()->json([
+            'success'    => true,
+            'message'    => 'OTP sent to email',
+            'expires_in' => 300 // 5 minutes
+        ]);
+    }
+
+    // ==============================
+    // VERIFY OTP & CREATE USER
+    // ==============================
+    public function verifyOtpAndCreate(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp'   => 'required|digits:6',
+        ]);
+
+        $record = DB::table('email_otps')
+            ->where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->where('expires_at', '>=', now())
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid or expired OTP'
+            ], 422);
+        }
+
+        // NID IMAGE
+        $nidImageName = null;
+
+        if ($request->hasFile('nid_image')) {
+            $nidImageName = $request->file('nid_image')
+                ->store('nid_images', 'public');
+        }
+
+        $user = User::create([
+    'name'       => $request->name,
+    'email'      => $request->email,
+    'phone'      => $request->phone,
+    'dob'        => $request->dob,
+    'nid'        => $request->nid,
+    'nid_image'  => $nidImageName,
+    'address'    => $request->address,
+    'occupation' => $request->occupation,
+    'income'     => $request->income,
+    'role'       => $request->role ?? 'user',
+    'status'     => 'active',
+    'password'   => bcrypt($request->password),
+]);
+
+        DB::table('email_otps')
+            ->where('email', $request->email)
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User created successfully',
+            'user'    => $user
+        ]);
+
+    }
+
+    // ==============================
+    // UPDATE USER STATUS
+    // ==============================
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:inactive,active,blocked,rejected',
         ]);
 
         $user = User::findOrFail($id);
+        $user->status = $request->status;
+        $user->save();
 
-        if ($request->hasFile('nid_image')) {
-            $imageName = time() . '_' . $request->file('nid_image')->getClientOriginalName();
-            $request->file('nid_image')->storeAs('public/nid_images', $imageName);
-            $user->nid_image = $imageName;
-        }
-
-        $user->update([
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'phone'       => $request->phone,
-            'dob'         => $request->dob,
-            'nid'         => $request->nid,
-            'address'     => $request->address,
-            'occupation'  => $request->occupation,
-            'income'      => $request->income,
-            'role'        => $request->role,
-        ]);
-
-        return redirect()->back()->with('success', 'User updated successfully!');
+        return back()->with('success', 'User status updated successfully.');
     }
 
-    public function updateStatus(Request $request, $id)
-{
-    $request->validate([
-        'status' => 'required|in:inactive,active,blocked,rejected',
-    ]);
-
-    $user = User::findOrFail($id);
-    $user->status = $request->status;
-    $user->save();
-
-    return back()->with('success', 'User status updated successfully.');
-}
-
-
-    // Destroy
+    // ==============================
+    // DELETE USER
+    // ==============================
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -110,5 +135,4 @@ class AdminUserController extends Controller
 
         return redirect()->back()->with('success', 'User deleted successfully!');
     }
-
 }
