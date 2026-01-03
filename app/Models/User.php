@@ -64,17 +64,23 @@ protected static function booted()
 {
     static::creating(function ($user) {
         DB::transaction(function () use ($user) {
+            $year = date('Y'); // current year
+
+            // Get the max account number for this year
             $lastNumber = DB::table('users')
-                ->where('account_number', 'like', 'LOAN%')
+                ->where('account_number', 'like', $year . '%')
                 ->lockForUpdate()
                 ->max(DB::raw("CAST(SUBSTRING(account_number, 5) AS UNSIGNED)"));
 
-            $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
+            // Start from 10001 if no previous account for this year
+            $nextNumber = $lastNumber ? $lastNumber + 1 : 10001;
 
-            $user->account_number = 'LOAN' . str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+            // Combine year + padded number
+            $user->account_number = $year . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
         });
     });
 }
+
 
 
 public function loans()

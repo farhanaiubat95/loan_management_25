@@ -8,6 +8,7 @@ class Loan extends Model
 {
     protected $fillable = [
         'user_id',
+        'loan_type_id',
         'loan_type',
         'amount',
         'duration',
@@ -28,6 +29,11 @@ class Loan extends Model
     {
         return $this->hasMany(LoanPayment::class);
     }
+
+    public function loanType()
+{
+    return $this->belongsTo(LoanType::class);
+}
 
     // Actual payment transactions
     public function transactions()

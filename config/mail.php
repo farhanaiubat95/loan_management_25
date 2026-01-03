@@ -115,4 +115,7 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+     // Add admin email here
+    'admin_email' => env('ADMIN_EMAIL', 'admin@example.com'),
+
 ];

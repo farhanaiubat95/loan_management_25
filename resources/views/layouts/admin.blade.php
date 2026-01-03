@@ -23,10 +23,16 @@
                     Users
                 </a>
 
+                <a href="{{ route('admin.loan-types.index') }}"
+                    class="block px-4 py-2 rounded
+                    {{ request()->routeIs('admin.loan-types.*') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                    Loans
+                </a>
+
                 <a href="{{ route('admin.loans') }}"
                     class="block px-4 py-2 rounded
                     {{ request()->routeIs('admin.loans') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    Loans
+                    All Loans
                 </a>
 
                 <a href="{{ route('admin.reports') }}"

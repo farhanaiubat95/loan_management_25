@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\AdminController\AdminUserController;
 use App\Http\Controllers\AdminController\AdminDashboardController;
+use App\Http\Controllers\AdminController\LoanTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoanController;
+use App\Http\Controllers\UserController\UserDashboardController;
+
 
 
 
@@ -33,7 +36,9 @@ Route::middleware(['auth', 'user'])
     ->prefix('user')
     ->name('user.')
     ->group(function () {
-        Route::get('/dashboard', fn () => view('dashboard.user'))->name('dashboard');
+        Route::get('/dashboard', [UserDashboardController::class, 'dashboard'])->name('dashboard');
+        Route::post('/loans', [UserDashboardController::class, 'store'])->name('loans.store');
+
     });
 
 
@@ -79,6 +84,15 @@ Route::middleware(['auth', 'admin'])
 
         Route::post('/installment/{id}/pay', [LoanController::class, 'markInstallmentPaid'])
             ->name('installment.pay');
+
+        Route::resource('loan-types', LoanTypeController::class);
+        Route::post('/loan-types', [LoanTypeController::class, 'store'])->name('loan-types.store');
+        Route::patch('loan-types/{loan_type}/toggle-status', [LoanTypeController::class, 'toggleStatus'])->name('loan-types.toggle-status');
+        Route::put('loan-types/{loan_type}', [LoanTypeController::class, 'update'])->name('loan-types.update');
+        Route::delete('loan-types/{loan_type}', [LoanTypeController::class, 'destroy'])->name('loan-types.destroy');
+
+
+
 
         
 
