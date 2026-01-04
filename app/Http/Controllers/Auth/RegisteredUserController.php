@@ -11,73 +11,110 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
+use App\Mail\UserOtpMail;
 
 class RegisteredUserController extends Controller
 {
-    /**
-     * Display the registration view.
-     */
     public function create(): View
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle an incoming registration request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
-    public function store(Request $request): RedirectResponse
+    // SEND OTP
+    public function sendOtp(Request $request)
     {
-        $request->validate([
-            'name'        => ['required', 'string', 'max:255'],
-            'email'       => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'phone'       => ['required', 'string', 'max:20'],
-            'dob'         => ['required', 'date'],
-            'nid'         => ['required', 'string', 'max:50'],
-            'nid_image'   => ['image', 'mimes:jpg,jpeg,png', 'max:2048'],
-            'address'     => ['required', 'string', 'max:500'],
-            'occupation'  => ['required', 'string', 'max:255'],
-            'income'      => ['required', 'numeric'],
-            'password'    => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        try {
+            $request->validate([
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|min:8|confirmed'
+            ]);
 
-        // ---------------------------
-        // Upload NID Image
-        // ---------------------------
+            // Handle file upload FIRST
+            $data = $request->except('_token');
+            if ($request->hasFile('nid_image')) {
+                $path = $request->file('nid_image')->store('public/nid_images');
+                $data['nid_image'] = basename($path);
+            }
 
-        $nidImageName = null;
+            session(['register_data' => $data]);
 
-        if ($request->hasFile('nid_image')) {
-            $nidImage = $request->file('nid_image');
-            $nidImageName = time() . '_' . $nidImage->getClientOriginalName();
+            $otp = rand(100000, 999999);
 
-            // Store inside storage/app/public/nid_images
-            $nidImage->storeAs('public/nid_images', $nidImageName);
+            DB::table('email_otps')->updateOrInsert(
+                ['email' => $request->email],
+                [
+                    'otp' => $otp,
+                    'expires_at' => now()->addMinutes(5),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            Mail::to($request->email)->send(new UserOtpMail($otp));
+
+            return response()->json(['success' => true]);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'OTP failed',
+                'message' => $e->getMessage()
+            ], 422);
         }
+    }
 
-        // ---------------------------
-        // Create User
-        // ---------------------------
+    // VERIFY OTP
+    public function verifyOtp(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'otp' => 'required|digits:6'
+            ]);
 
-        $user = User::create([
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'phone'       => $request->phone,
-            'dob'         => $request->dob,
-            'nid'         => $request->nid,
-            'nid_image'   => $nidImageName,
-            'address'     => $request->address,
-            'occupation'  => $request->occupation,
-            'income'      => $request->income,
-            'role'        => 'user',
-            'password'    => Hash::make($request->password),
-        ]);
+            $otpRow = DB::table('email_otps')
+                ->where('email', $request->email)
+                ->where('otp', $request->otp)
+                ->where('expires_at', '>=', now())
+                ->first();
 
-        event(new Registered($user));
+            if (!$otpRow) {
+                return response()->json(['error' => 'Invalid or expired OTP'], 422);
+            }
 
-        Auth::login($user);
+            $data = session('register_data');
+            if (!$data) {
+                return response()->json(['error' => 'Session expired'], 422);
+            }
 
-        return redirect(route('dashboard', absolute: false));
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'dob' => $data['dob'],
+                'nid' => $data['nid'],
+                'nid_image' => $data['nid_image'] ?? null,
+                'address' => $data['address'],
+                'occupation' => $data['occupation'],
+                'income' => $data['income'],
+                'role' => 'user',
+                'status' => 'inactive',
+                'password' => bcrypt($data['password']),
+            ]);
+
+            Auth::login($user);
+
+            DB::table('email_otps')->where('email', $request->email)->delete();
+            session()->forget('register_data');
+
+            return response()->json(['success' => true]);
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'error' => 'Verification failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

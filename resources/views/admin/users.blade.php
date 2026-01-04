@@ -108,19 +108,6 @@ $onlyUsers = $users->where('role', 'user');
                                 <i class="fa fa-eye"></i>
                             </button>
 
-                            {{-- EDIT --}}
-                            <button
-                                @if(!in_array($user->status, ['blocked', 'rejected']))
-                                    onclick='openEditModal(@json($user))'
-                                @endif
-                                class="px-2 py-1 rounded text-sm
-                                    {{ in_array($user->status, ['blocked', 'rejected']) ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700'
-                                    }}"
-                                {{ in_array($user->status, ['blocked', 'rejected']) ? 'disabled' : '' }}
-                            >
-                                <i class="fas fa-edit"></i>
-                            </button>
-
                             {{-- STATUS --}}
                             @if($user->status !== 'rejected')
                                 <button
@@ -477,11 +464,6 @@ $onlyUsers = $users->where('role', 'user');
 
             document.body.appendChild(form);
             form.submit();
-        }
-
-        // Open Edit Modal
-        function closeEditModal() {
-            document.getElementById("editModal").classList.add("hidden");
         }
 
         // Create account

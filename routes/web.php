@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LoanController;
 use App\Http\Controllers\UserController\UserDashboardController;
+use Illuminate\Support\Facades\Mail;
 
 
 
@@ -77,24 +78,19 @@ Route::middleware(['auth', 'admin'])
         Route::post('/loans', [LoanController::class, 'store'])->name('loans.store');
         Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update');
         Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
-        Route::post('/loans/{id}/status', [LoanController::class, 'updateStatus'])->name('loans.status');
-
+        Route::post('/loans/{loan}/status',  [AdminDashboardController::class, 'updateStatus'])->name('admin.loan.updateStatus');
         Route::get('/loans/{id}/schedule', [LoanController::class, 'schedule'])
             ->name('loans.schedule');
 
         Route::post('/installment/{id}/pay', [LoanController::class, 'markInstallmentPaid'])
             ->name('installment.pay');
 
+        // LOAN TYPES
         Route::resource('loan-types', LoanTypeController::class);
         Route::post('/loan-types', [LoanTypeController::class, 'store'])->name('loan-types.store');
         Route::patch('loan-types/{loan_type}/toggle-status', [LoanTypeController::class, 'toggleStatus'])->name('loan-types.toggle-status');
         Route::put('loan-types/{loan_type}', [LoanTypeController::class, 'update'])->name('loan-types.update');
-        Route::delete('loan-types/{loan_type}', [LoanTypeController::class, 'destroy'])->name('loan-types.destroy');
-
-
-
-
-        
+        Route::delete('loan-types/{loan_type}', [LoanTypeController::class, 'destroy'])->name('loan-types.destroy');   
 
         // REPORTS
         Route::get('/reports', fn () => view('admin.reports'))->name('reports');

@@ -8,19 +8,16 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use App\Models\Loan;
 
-class UserOtpMail extends Mailable
+
+class LoanStatusApprovedMail extends Mailable
 {
-    public $otp;
-
-    public function __construct($otp)
-    {
-        $this->otp = $otp;
-    }
+    public function __construct(public Loan $loan) {}
 
     public function build()
     {
-        return $this->subject('Your OTP Code')
-            ->view('emails.user-otp');
+        return $this->subject('Your Loan Has Been Approved')
+            ->view('emails.loan-approved');
     }
 }

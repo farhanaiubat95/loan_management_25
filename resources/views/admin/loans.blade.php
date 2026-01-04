@@ -256,26 +256,52 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
     <!-- ------------------------------ -->
     <!-- STATUS MODAL -->
     <!-- ------------------------------ -->
-    <form method="POST" id="statusForm">
-        @csrf
+    <!-- ------------------------------ -->
+    <!-- STATUS MODAL -->
+    <!-- ------------------------------ -->
+    <div id="statusModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4">
     
-        <select name="status" id="statusSelect" class="w-full p-2 border rounded mt-1"
-            onchange="toggleRejectReason(this.value)" required>
-        </select>
+        <div class="bg-white w-full max-w-md rounded-xl shadow-xl p-6 relative">
     
-        <!-- Reject Reason (only shown if rejected) -->
-        <div id="rejectReasonBox" class="mt-4 hidden">
-            <label class="block text-sm font-medium text-gray-700">
-                Rejection Reason (will be emailed)
-            </label>
-            <textarea name="reject_reason" id="reject_reason" class="w-full p-2 border rounded mt-1"
-                placeholder="Explain why this loan was rejected"></textarea>
+            <h2 class="text-xl font-bold mb-4">Update Loan Status</h2>
+    
+            <form method="POST" id="statusForm">
+                @csrf
+    
+                <label class="block text-sm font-medium text-gray-700">
+                    Select Status
+                </label>
+    
+                <select name="status" id="statusSelect" class="w-full p-2 border rounded mt-1"
+                    onchange="toggleRejectReason(this.value)" required>
+                </select>
+    
+                <!-- Reject Reason -->
+                <div id="rejectReasonBox" class="mt-4 hidden">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Rejection Reason (will be emailed)
+                    </label>
+                    <textarea name="reject_reason" id="reject_reason" class="w-full p-2 border rounded mt-1"
+                        placeholder="Explain why this loan was rejected"></textarea>
+                </div>
+    
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeStatusModal()" class="px-4 py-2 bg-gray-200 rounded">
+                        Cancel
+                    </button>
+    
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded">
+                        Update
+                    </button>
+                </div>
+            </form>
+    
+            <button onclick="closeStatusModal()" class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
+                &times;
+            </button>
         </div>
-    
-        <button class="mt-6 px-6 py-2 bg-blue-600 text-white rounded">
-            Update
-        </button>
-    </form>
+    </div>
+
 
 
     <!-- EDIT LOAN MODAL -->
@@ -599,6 +625,23 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
             });
         }
     </script>
+
+    <script>
+        function toggleRejectReason(status) {
+            const box = document.getElementById('rejectReasonBox');
+            const textarea = document.getElementById('reject_reason');
+
+            if (status === 'rejected') {
+                box.classList.remove('hidden');
+                textarea.required = true;
+            } else {
+                box.classList.add('hidden');
+                textarea.required = false;
+                textarea.value = '';
+            }
+        }
+    </script>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
