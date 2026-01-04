@@ -90,28 +90,60 @@
                 Already registered?
             </a>
 
-            <button id="registerBtn" disabled class="bg-gray-400 cursor-not-allowed px-6 py-2 rounded-lg text-white">
-                Register
+            <button id="registerBtn" type="button"
+                class="bg-gray-400 cursor-not-allowed px-6 py-2 rounded-lg text-white flex items-center gap-2">
+                <svg id="btnLoader" class="hidden w-4 h-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+                <span id="btnText">Register</span>
             </button>
+
+
         </div>
     </form>
 
-    <div id="otpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
-    <div class="bg-white p-6 rounded w-96">
-        <h3 class="font-bold mb-2">Verify OTP</h3>
-
-        <input id="otpInput" class="w-full border p-2 mb-2" placeholder="6 digit OTP">
-
-        <p class="text-sm mb-2">
-            Expires in <span id="otpTimer">05:00</span>
-        </p>
-
-        <button id="verifyOtpBtn"
-            class="w-full bg-blue-600 text-white py-2 rounded">
-            Verify OTP
-        </button>
+    <div id="otpModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+    
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
+    
+            <!-- Close -->
+            <button onclick="otpModal.classList.add('hidden')"
+                class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                ✕
+            </button>
+    
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <div class="mx-auto w-12 h-12 flex items-center justify-center
+                    rounded-full bg-blue-100 text-blue-600 text-xl font-bold">
+                    🔐
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mt-3">
+                    OTP Verification
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    Enter the 6-digit code sent to your email
+                </p>
+            </div>
+    
+            <!-- OTP Input -->
+            <input id="otpInput" maxlength="6" inputmode="numeric" class="w-full text-center tracking-widest text-xl border rounded-lg py-3
+                focus:ring-2 focus:ring-blue-500 focus:outline-none mb-3" placeholder="••••••">
+    
+            <!-- Timer -->
+            <p class="text-center text-sm text-gray-500 mb-4">
+                Code expires in <span id="otpTimer" class="font-semibold text-red-500">05:00</span>
+            </p>
+    
+            <!-- Verify Button -->
+            <button id="verifyOtpBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">
+                Verify & Continue
+            </button>
+        </div>
     </div>
-</div>
+
 
 
     <!-- JS VALIDATION -->
@@ -153,7 +185,7 @@
                 validate[k](document.getElementById(k).value)
             );
 
-            btn.disabled = !ok;
+            btn.dataset.valid = ok ? '1' : '0';
             btn.className = ok
                 ? 'bg-blue-900 hover:bg-blue-800 px-6 py-2 rounded-lg text-white'
                 : 'bg-gray-400 cursor-not-allowed px-6 py-2 rounded-lg text-white';
@@ -202,26 +234,46 @@
 const form = document.getElementById('registerForm');
 const otpModal = document.getElementById('otpModal');
 
-document.getElementById('registerBtn').addEventListener('click', async () => {
-    const res = await fetch("{{ route('register.sendOtp') }}", {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: new FormData(form)
+
+// REGISTER
+    document.getElementById('registerBtn').addEventListener('click', async () => {
+
+        if (btn.dataset.valid !== '1') {
+            alert('Please fix validation errors first');
+            return;
+        }
+
+        // 🔒 LOCK BUTTON
+        btn.disabled = true;
+        btn.className = 'bg-gray-400 cursor-not-allowed px-6 py-2 rounded-lg text-white flex items-center gap-2';
+        document.getElementById('btnText').innerText = 'Sending OTP...';
+        document.getElementById('btnLoader').classList.remove('hidden');
+
+        const res = await fetch("{{ route('register.sendOtp') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: new FormData(form)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            otpModal.classList.remove('hidden');
+            startOtpTimer();
+        } else {
+            alert(data.message || 'OTP send failed');
+
+            // 🔓 UNLOCK BUTTON IF ERROR
+            btn.disabled = false;
+            document.getElementById('btnText').innerText = 'Register';
+            document.getElementById('btnLoader').classList.add('hidden');
+        }
     });
 
-    const data = await res.json();
 
-    if (res.ok) {
-        otpModal.classList.remove('hidden');
-        startOtpTimer();
-    } else {
-        alert(data.message || 'OTP send failed');
-    }
-});
-
-
+// OTP timer
 let otpTime = 300;
 function startOtpTimer() {
     otpTime = 300;
@@ -234,25 +286,33 @@ function startOtpTimer() {
 
 </script>
 <script>
-document.getElementById('verifyOtpBtn').onclick = async () => {
-    const res = await fetch("{{ route('register.verifyOtp') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            email: document.getElementById('email').value,
-            otp: document.getElementById('otpInput').value
-        })
-    });
+    document.getElementById('verifyOtpBtn').onclick = async () => {
 
-    if (res.ok) {
-        window.location.href = "{{ route('dashboard') }}";
-    } else {
-        alert('Invalid OTP');
-    }
-};
+        const verifyBtn = document.getElementById('verifyOtpBtn');
+        verifyBtn.disabled = true;
+        verifyBtn.innerText = 'Verifying...';
+
+        const res = await fetch("{{ route('register.verifyOtp') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                email: document.getElementById('email').value,
+                otp: document.getElementById('otpInput').value
+            })
+        });
+
+        if (res.ok) {
+            window.location.href = "{{ route('dashboard') }}";
+        } else {
+            alert('Invalid OTP');
+            verifyBtn.disabled = false;
+            verifyBtn.innerText = 'Verify & Continue';
+        }
+    };
+
 </script>
 
 
