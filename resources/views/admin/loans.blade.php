@@ -23,10 +23,6 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
             <button onclick="downloadLoanPDF()" class="px-4 py-2 bg-purple-600 text-white rounded">
                 Download PDF
             </button>
-
-            <button onclick="openCreateModal()" class="px-4 py-2 bg-red-900 text-white rounded hover:bg-blue-700">
-                + Create Loan
-            </button>
         </div>
     
     </div>
@@ -146,61 +142,6 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
             </tbody>
 
         </table>
-    </div>
-
-
-    <!-- ------------------------------ -->
-    <!-- CREATE LOAN MODAL -->
-    <!-- ------------------------------ -->
-    <div id="createModal"
-        class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto">
-
-        <div class="bg-white w-full max-w-3xl rounded-2xl shadow-xl p-8 relative max-h-[90vh] overflow-y-auto">
-            <h2 class="text-xl font-bold mb-4">Create New Loan</h2>
-
-            <form method="POST" action="{{ route('admin.loans.store') }}">
-                @csrf
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    <div>
-                        <label>User</label>
-                        <select name="user_id" class="w-full p-2 border rounded mt-1">
-                            @foreach ($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <label>Loan Amount</label>
-                        <input type="number" name="amount" class="w-full p-2 border rounded mt-1" required>
-                    </div>
-
-                    <div>
-                        <label>Duration (Months)</label>
-                        <input type="number" name="duration" class="w-full p-2 border rounded mt-1" required>
-                    </div>
-
-                    <div>
-                        <label>Interest Rate (%)</label>
-                        <input type="number" name="interest_rate" class="w-full p-2 border rounded mt-1" required>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label>Description</label>
-                        <textarea name="description" class="w-full p-2 border rounded mt-1"></textarea>
-                    </div>
-
-                </div>
-
-                <button class="mt-6 px-6 py-2 bg-blue-600 text-white rounded">Create Loan</button>
-            </form>
-
-            <button onclick="closeCreateModal()"
-                class="absolute top-4 right-4 text-xl text-gray-600 hover:text-black">&times;</button>
-        </div>
     </div>
 
 
@@ -471,16 +412,6 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
     <!-- JAVASCRIPT LOGIC -->
     <!-- ------------------------------ -->
     <script>
-        // Open Create Modal
-        function openCreateModal() {
-            document.getElementById("createModal").classList.remove("hidden");
-        }
-
-        // Close Create Modal
-        function closeCreateModal() {
-            document.getElementById("createModal").classList.add("hidden");
-        }
-
         // View Modal
         function openViewModal(loan) {
             document.getElementById("v_user").innerText = loan.user?.name;
