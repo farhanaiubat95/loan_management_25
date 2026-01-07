@@ -7,15 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     protected $fillable = [
-        'loan_id',
-        'loan_payment_id',
-        'user_id',
-        'amount',
-        'payment_method',
-        'transaction_id',
-        'notes',
-        'paid_at',
+    'loan_id',
+    'loan_payment_id',
+    'user_id',
+    'amount',
+    'payment_method',
+    'transaction_id',
+    'type',         
+    'status',       
+    'notes',
+    'paid_at',
     ];
+
 
     public function loan()
     {

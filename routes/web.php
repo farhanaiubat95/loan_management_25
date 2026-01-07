@@ -93,7 +93,7 @@ Route::middleware(['auth', 'admin'])
         Route::delete('loan-types/{loan_type}', [LoanTypeController::class, 'destroy'])->name('loan-types.destroy');   
 
         // REPORTS
-        Route::get('/reports', fn () => view('admin.reports'))->name('reports');
+        Route::get('/payment', fn () => view('admin.payment'))->name('payment');
     });
 
 require __DIR__.'/auth.php';
