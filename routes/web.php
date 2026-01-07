@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController\AdminUserController;
 use App\Http\Controllers\AdminController\AdminDashboardController;
+use App\Http\Controllers\AdminController\LoanPaymentController;
 use App\Http\Controllers\AdminController\LoanTypeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
@@ -92,8 +93,16 @@ Route::middleware(['auth', 'admin'])
         Route::put('loan-types/{loan_type}', [LoanTypeController::class, 'update'])->name('loan-types.update');
         Route::delete('loan-types/{loan_type}', [LoanTypeController::class, 'destroy'])->name('loan-types.destroy');   
 
-        // REPORTS
-        Route::get('/payment', fn () => view('admin.payment'))->name('payment');
+        // LOAN PAYMENT
+        Route::get('/payment', [LoanPaymentController::class, 'index'])->name('payment');
+
+        Route::get('/loans/{loan}/payment', [LoanPaymentController::class, 'show'])
+            ->name('loan.payment');
+
+        // LOAN DISBURSEMENT
+        Route::post('/loans/{loan}/disburse', 
+            [LoanPaymentController::class, 'disburse']
+        )->name('loan.disburse');
     });
 
 require __DIR__.'/auth.php';

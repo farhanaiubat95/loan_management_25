@@ -29,6 +29,7 @@ return new class extends Migration
     Schema::table('loans', function (Blueprint $table) {
         $table->dropForeign(['loan_type_id']);
         $table->dropColumn(['loan_type_id','interest_rate']);
+        
     });
 }
 
