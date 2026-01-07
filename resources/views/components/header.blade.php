@@ -5,7 +5,7 @@
 
             <!-- LOGO -->
             <a href="{{ route('welcome') }}">
-                <h1 class="text-2xl font-semibold italic underline text-blue-950">LONERY</h1>
+                <h1 class="text-2xl font-semibold italic underline text-blue-950">LONERY Bank Limited</h1>
             </a>
             <!-- DESKTOP NAV -->
             <nav class="hidden lg:flex items-center gap-10 text-gray-700 font-medium">

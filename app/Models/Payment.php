@@ -25,6 +25,11 @@ class Payment extends Model
         return $this->belongsTo(Loan::class);
     }
 
+    public function bankAccount()
+    {
+        return $this->belongsTo(BankAccount::class);
+    }
+
     public function installment()
     {
         return $this->belongsTo(LoanPayment::class, 'loan_payment_id');

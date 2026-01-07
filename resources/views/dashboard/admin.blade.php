@@ -42,6 +42,38 @@ $pendingLoans = \App\Models\Loan::where('status', 'pending')->count();
             <p class="text-sm text-gray-500 mt-2">Waiting for admin review</p>
         </div>
 
+        {{-- Total Balance --}}
+        <div class="bg-white p-6 shadow rounded-xl border">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-700"><i class="fa-solid fa-circle-dollar-to-slot text-red-800"></i>
+                    Total Balance</h3>
+                <span class="text-red-800 text-xl font-bold">{{ $pendingLoans }}</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">All balances in system</p>
+        </div>
+
+        {{-- Total Bank Account --}}
+        <div class="bg-white p-6 shadow rounded-xl border">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-700">
+                  🏦 Total Bank Account</h3>
+                <span class="text-gray-500 text-xl font-bold">{{ $pendingLoans }}</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">
+                All bank accounts in system
+            </p>
+        </div>
+
+        {{-- Total Transaction --}}
+        <div class="bg-white p-6 shadow rounded-xl border">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-700"><i class="fa-solid fa-money-bill-transfer text-purple-800"></i>
+                    Total Transaction</h3>
+                <span class="text-purple-800 text-xl font-bold">{{ $pendingLoans }}</span>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">All transaction in system</p>
+        </div>
+
     </div>
 
 

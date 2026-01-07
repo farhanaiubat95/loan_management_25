@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController\AdminUserController;
 use App\Http\Controllers\AdminController\AdminDashboardController;
 use App\Http\Controllers\AdminController\LoanPaymentController;
 use App\Http\Controllers\AdminController\LoanTypeController;
+use App\Http\Controllers\AdminController\BankController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -103,6 +104,12 @@ Route::middleware(['auth', 'admin'])
         Route::post('/loans/{loan}/disburse', 
             [LoanPaymentController::class, 'disburse']
         )->name('loan.disburse');
+
+        // BANKS AND ACCOUNTS
+        Route::get('/banks', [BankController::class, 'index'])->name('banks.index');
+        Route::post('/banks', [BankController::class, 'store'])->name('banks.store');
+        Route::post('/banks/accounts/{account}/toggle', [BankController::class, 'toggleAccount'])
+            ->name('banks.accounts.toggle');
     });
 
 require __DIR__.'/auth.php';

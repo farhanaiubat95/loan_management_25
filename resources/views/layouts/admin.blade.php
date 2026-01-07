@@ -14,31 +14,37 @@
                 <a href="{{ route('admin.dashboard') }}"
                     class="block px-4 py-2 rounded 
                     {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    Dashboard
+                    <i class="fa-solid fa-chart-line mr-2"></i>  Dashboard
+                </a>
+
+                <a href="{{ route('admin.banks.index') }}"
+                    class="block px-4 py-2 rounded
+                    {{ request()->routeIs('admin.banks.index') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                    <span class="mr-2">🏦</span> Bank Details
                 </a>
 
                 <a href="{{ route('admin.users') }}"
                     class="block px-4 py-2 rounded
                     {{ request()->routeIs('admin.users') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    Users
+                    <i class="fa-solid fa-users mr-2"></i> Users
                 </a>
 
                 <a href="{{ route('admin.loan-types.index') }}"
                     class="block px-4 py-2 rounded
                     {{ request()->routeIs('admin.loan-types.*') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    Loans
+                    <i class="fas fa-hand-holding-usd mr-2"></i> Loans
                 </a>
 
                 <a href="{{ route('admin.loans') }}"
                     class="block px-4 py-2 rounded
                     {{ request()->routeIs('admin.loans') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    All Loans
+                    <i class="fas fa-donate mr-2"></i> All Loans
                 </a>
 
                 <a href="{{ route('admin.payment') }}"
                     class="block px-4 py-2 rounded
                     {{ request()->routeIs('admin.payment') ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                    payment
+                    <i class="fa-solid fa-money-bill-transfer mr-2"></i> Loan Distribution
                 </a>
 
             </nav>

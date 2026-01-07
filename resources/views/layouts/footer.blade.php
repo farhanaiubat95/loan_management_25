@@ -45,6 +45,6 @@
     </div>
 
     <p class="text-center text-xs text-gray-500 mt-10">
-        © 2025 Lonery — All rights reserved
+        © 2025 LONERY Bank Limited — All rights reserved
     </p>
 </footer>

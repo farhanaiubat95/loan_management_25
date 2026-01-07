@@ -7,7 +7,7 @@
                 <div class="shrink-0 flex items-center">
                     <!-- LOGO -->
                     <a href="{{ route('welcome') }}">
-                        <h1 class="text-2xl font-semibold italic underline text-white">LONERY</h1>
+                        <h1 class="text-2xl font-semibold italic underline text-white">LONERY Bank Limited</h1>
                     </a>
                 </div>
 
