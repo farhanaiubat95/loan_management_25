@@ -103,7 +103,7 @@ $pendingLoans = \App\Models\Loan::where('status', 'pending')->count();
 
                                 <td class="p-3">{{ $loan->user->account_number }}</td>
 
-                                <td class="p-3">৳{{ number_format($loan->amount) }}</td>
+                                <td class="p-3">Tk {{ number_format($loan->amount) }}</td>
 
                                 <td class="p-3">
                                     <span class="px-2 py-1 rounded text-xs
