@@ -20,7 +20,7 @@
                 <div>
                     <h4 class="font-semibold text-gray-700 mb-2">Loan Info</h4>
                     <p>Loan ID: {{ $loan->id }}</p>
-                    <p>Amount: ৳{{ number_format($loan->amount, 2) }}</p>
+                    <p>Amount: Tk {{ number_format($loan->amount, 2) }}</p>
                     <p>Status:
                         <span class="text-green-600 font-semibold">
                             {{ ucfirst($loan->status) }}
@@ -30,9 +30,9 @@
 
                 <!-- Action -->
                 <div class="flex items-center">
-                    <form action="{{ route('admin.loan.disburse', $loan->id) }}" method="POST">
+                    <form action="{{ route('admin.loan.ssl.pay', $loan->id) }}" method="POST">
                         @csrf
-                        <button class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
                             Distribute Loan
                         </button>
                     </form>

@@ -14,3 +14,5 @@
 8. <img src="{{ asset('storage/all_support_images/loan-logo.jfif') }}"
             class="absolute inset-0 w-full h-full object-cover" />
 9. For controller ->  php artisan make:controller AdminController/LoanPaymentController
+9. For Middleware ->  php artisan make:middleware VerifyCsrfToken
+10. Check error ->  dd($response->json());

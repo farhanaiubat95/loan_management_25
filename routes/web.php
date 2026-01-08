@@ -55,14 +55,27 @@ Route::middleware(['auth', 'manager'])
     });
 
 
+    /*
+|--------------------------------------------------------------------------
+| SSLCommerz CALLBACK ROUTES (NO AUTH, NO CSRF)
+|--------------------------------------------------------------------------
+*/
+Route::match(['get', 'post'], '/ssl/success', [LoanPaymentController::class, 'sslSuccess'])
+    ->name('ssl.success');
+
+Route::match(['get', 'post'], '/ssl/fail', [LoanPaymentController::class, 'sslFail'])
+    ->name('ssl.fail');
+
+Route::match(['get', 'post'], '/ssl/cancel', [LoanPaymentController::class, 'sslCancel'])
+    ->name('ssl.cancel');
+
 // ADMIN ROUTES
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
 
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-            ->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         // USERS
         Route::get('/users', [AdminUserController::class, 'index'])->name('users');
@@ -81,11 +94,9 @@ Route::middleware(['auth', 'admin'])
         Route::put('/loans/{id}', [LoanController::class, 'update'])->name('loans.update');
         Route::delete('/loans/{id}', [LoanController::class, 'destroy'])->name('loans.destroy');
         Route::post('/loans/{loan}/status',  [AdminDashboardController::class, 'updateStatus'])->name('admin.loan.updateStatus');
-        Route::get('/loans/{id}/schedule', [LoanController::class, 'schedule'])
-            ->name('loans.schedule');
+        Route::get('/loans/{id}/schedule', [LoanController::class, 'schedule'])->name('loans.schedule');
 
-        Route::post('/installment/{id}/pay', [LoanController::class, 'markInstallmentPaid'])
-            ->name('installment.pay');
+        Route::post('/installment/{id}/pay', [LoanController::class, 'markInstallmentPaid'])->name('installment.pay');
 
         // LOAN TYPES
         Route::resource('loan-types', LoanTypeController::class);
@@ -96,20 +107,20 @@ Route::middleware(['auth', 'admin'])
 
         // LOAN PAYMENT
         Route::get('/payment', [LoanPaymentController::class, 'index'])->name('payment');
-
-        Route::get('/loans/{loan}/payment', [LoanPaymentController::class, 'show'])
-            ->name('loan.payment');
+        Route::get('/payment/success/{loan}', [LoanPaymentController::class, 'paymentSuccess'])->name('payment.success');
+        Route::get('/loans/{loan}/payment', [LoanPaymentController::class, 'show'])->name('loan.payment');
 
         // LOAN DISBURSEMENT
-        Route::post('/loans/{loan}/disburse', 
-            [LoanPaymentController::class, 'disburse']
-        )->name('loan.disburse');
+        Route::post('/loans/{loan}/disburse', [LoanPaymentController::class, 'disburse'])->name('loan.disburse');
 
         // BANKS AND ACCOUNTS
         Route::get('/banks', [BankController::class, 'index'])->name('banks.index');
         Route::post('/banks', [BankController::class, 'store'])->name('banks.store');
-        Route::post('/banks/accounts/{account}/toggle', [BankController::class, 'toggleAccount'])
-            ->name('banks.accounts.toggle');
+        Route::post('/banks/accounts/{account}/toggle', [BankController::class, 'toggleAccount'])->name('banks.accounts.toggle');
+
+        // SSLCommerz Payment
+        Route::post('/loans/{loan}/ssl-pay', [LoanPaymentController::class, 'sslPay'])->name('loan.ssl.pay');
+
     });
 
 require __DIR__.'/auth.php';
