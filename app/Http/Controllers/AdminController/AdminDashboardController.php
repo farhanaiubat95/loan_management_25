@@ -5,6 +5,9 @@ namespace App\Http\Controllers\AdminController;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Loan;
+use App\Models\Payment;
+use App\Models\BankAccount;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\LoanStatusApprovedMail;
@@ -14,23 +17,34 @@ use Illuminate\Support\Facades\Log;
 class AdminDashboardController extends Controller
 {
     public function index()
-    {
-        $totalUsers = User::where('role', 'user')->count();
-        $totalLoans = Loan::whereIn('status', ['active', 'completed'])->count();
-        $pendingLoans = Loan::where('status', 'pending')->count();
+{
+    $totalUsers = User::where('role', 'user')->count();
 
-        $recentLoans = Loan::with('user')
-            ->latest()
-            ->take(5)
-            ->get();
+    $totalLoans = Loan::whereIn('status', ['active', 'completed'])->count();
 
-        return view('dashboard.admin', compact(
-            'totalUsers',
-            'totalLoans',
-            'pendingLoans',
-            'recentLoans'
-        ));
-    }
+    $pendingLoans = Loan::where('status', 'pending')->count();
+
+    $totalBalance = BankAccount::sum('current_balance');
+
+    $totalBankAccounts = BankAccount::count();
+
+    $totalTransactions = Payment::count();
+
+    $recentLoans = Loan::with('user')
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return view('dashboard.admin', compact(
+        'totalUsers',
+        'totalLoans',
+        'pendingLoans',
+        'totalBalance',
+        'totalBankAccounts',
+        'totalTransactions',
+        'recentLoans'
+    ));
+}
 
     
 

@@ -12,7 +12,6 @@ class DashboardController extends Controller
 
         return match ($role) {
             'admin'   => redirect()->route('admin.dashboard'),
-            'manager' => redirect()->route('manager.dashboard'),
             default   => redirect()->route('user.dashboard'),
         };
     }
