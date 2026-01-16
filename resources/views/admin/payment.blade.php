@@ -1,9 +1,39 @@
 <x-admin-layout>
+    @foreach($loans as $loan)
+
+
+    @endforeach
+
+    @if(session('error'))
+        <script>
+            alert("{{ session('error') }}");
+        </script>
+    @endif
+
+    @if(session('success'))
+        <script>
+            alert("{{ session('success') }}");
+        </script>
+    @endif
+
+
     <div class="p-6 space-y-6">
 
         <h2 class="text-2xl font-bold text-gray-800">
             Approved Loan Disbursement
         </h2>
+        @if (session('error'))
+            <div class="mb-4 p-4 rounded bg-red-100 text-red-700">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('success'))
+            <div class="mb-4 p-4 rounded bg-green-100 text-green-700">
+                {{ session('success') }}
+            </div>
+        @endif
+
 
         @foreach($loans as $loan)
             <div class="bg-white rounded-xl shadow p-6 border grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -30,12 +60,15 @@
 
                 <!-- Action -->
                 <div class="flex items-center">
-                    <form action="{{ route('admin.loan.ssl.pay', $loan->id) }}" method="POST">
+                    <form method="POST" 
+                        action="{{ route('admin.loan.disburse', $loan) }}">
                         @csrf
-                        <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        <button type="submit"
+                            class="px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-600 hover:text-white">
                             Distribute Loan
                         </button>
                     </form>
+
                 </div>
 
             </div>
@@ -46,4 +79,11 @@
         @endif
 
     </div>
+
+    <script>
+        function showLoading(form) {
+            alert('Processing loan transfer...\nPlease wait.');
+        }
+    </script>
+
 </x-admin-layout>
