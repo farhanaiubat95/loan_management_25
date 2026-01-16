@@ -16,12 +16,8 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
             class="border rounded px-3 py-2 w-64" />
     
         <div class="flex gap-2">
-            <button onclick="downloadCSV()" class="px-4 py-2 bg-yellow-600 text-white rounded">
+            <button type="button" onclick="downloadCSV()" class="px-4 py-2 bg-yellow-600 text-white rounded">
                 Download CSV
-            </button>
-    
-            <button onclick="downloadLoanPDF()" class="px-4 py-2 bg-purple-600 text-white rounded">
-                Download PDF
             </button>
         </div>
     
@@ -231,9 +227,11 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
                         Cancel
                     </button>
     
-                    <button class="px-4 py-2 bg-blue-600 text-white rounded">
-                        Update
+                    <button type="submit" id="statusSubmitBtn"
+                        class="px-4 py-2 bg-blue-600 text-white rounded flex items-center gap-2 justify-center">
+                        <span id="statusBtnText">Update</span>
                     </button>
+
                 </div>
             </form>
     
@@ -407,6 +405,18 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
 
     </script>
 
+    {{-- Status Modal --}}
+    <script>
+        document.getElementById('statusForm').addEventListener('submit', function () {
+            const btn = document.getElementById('statusSubmitBtn');
+            const text = document.getElementById('statusBtnText');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            text.innerText = 'Updating...';
+        });
+    </script>
+
 
     <!-- ------------------------------ -->
     <!-- JAVASCRIPT LOGIC -->
@@ -468,73 +478,69 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
 
         // Download CSV
         function downloadCSV() {
-                let rows = document.querySelectorAll("tbody tr");
+                console.log("CSV download started");
+
+                let rows = document.querySelectorAll("tbody tr:not(#noDataRow)");
                 let csv = [];
 
-                csv.push(["ID", "User", "Amount", "Duration", "Interest", "EMI", "Status"]);
+                // Correct headers (match table)
+                csv.push([
+                    "ID",
+                    "Account Number",
+                    "Loan Type",
+                    "Amount",
+                    "Duration",
+                    "Interest",
+                    "EMI",
+                    "Status"
+                ]);
+
+                let rowCount = 0;
 
                 rows.forEach(row => {
                     if (row.style.display === "none") return;
 
                     let cols = row.querySelectorAll("td");
+                    if (cols.length < 8) return; // safety
+
                     csv.push([
-                        cols[0].innerText,
-                        cols[1].innerText,
-                        cols[2].innerText,
-                        cols[3].innerText,
-                        cols[4].innerText,
-                        cols[5].innerText,
-                        cols[6].innerText
+                        cols[0].innerText.trim(),
+                        cols[1].innerText.trim(),
+                        cols[2].innerText.trim(),
+                        cols[3].innerText.trim(),
+                        cols[4].innerText.trim(),
+                        cols[5].innerText.trim(),
+                        cols[6].innerText.trim(),
+                        cols[7].innerText.trim()
                     ]);
+
+                    rowCount++;
                 });
 
-                let blob = new Blob([csv.map(e => e.join(",")).join("\n")],
-                    { type: "text/csv" });
+                console.log("Rows added to CSV:", rowCount);
+
+                if (rowCount === 0) {
+                    alert("No data available to download");
+                    return;
+                }
+
+                let csvContent = csv.map(row => row.join(",")).join("\n");
+
+                let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+                let url = URL.createObjectURL(blob);
 
                 let a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = "loans.csv";
+                a.href = url;
+                a.download = "loan_report.csv";
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(url);
+
             }
 
-
-            // Download PDF
-             function downloadLoanPDF() {
-
-                    let headers = [
-                        "ID",
-                        "Borrower",
-                        "Amount",
-                        "Duration",
-                        "Interest",
-                        "EMI",
-                        "Status"
-                    ];
-
-                    let rows = [];
-
-                    document.querySelectorAll("tbody tr").forEach(row => {
-                        if (row.style.display === "none") return; // respect search
-
-                        let cols = row.querySelectorAll("td");
-
-                        rows.push([
-                            cols[0].innerText,
-                            cols[1].innerText,
-                            cols[2].innerText,
-                            cols[3].innerText,
-                            cols[4].innerText,
-                            cols[5].innerText,
-                            cols[6].innerText
-                        ]);
-                    });
-
-                    generatePDF({
-                        title: "Loan Report",
-                        headers: headers,
-                        rows: rows
-                    });
-                }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -557,6 +563,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
         }
     </script>
 
+    {{--    Reject Reason --}}
     <script>
         function toggleRejectReason(status) {
             const box = document.getElementById('rejectReasonBox');
@@ -578,6 +585,7 @@ $actionBtn = "w-7 h-7 flex items-center justify-center rounded text-white text-s
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
     
     <script src="{{ asset('js/pdf-helper.js') }}"></script>
+
 
 
 
